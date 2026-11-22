@@ -2075,7 +2075,11 @@
             BADMINTON_COURT: 29,
             PICKLEBALL_COURT: 30,
             RED_BLOCK: 31,
-            RED_GATE: 32
+            RED_GATE: 32,
+            GH_WALL: 33,
+            GH_DOOR: 34,
+            GH_PATH: 35,
+            GH_BED: 36
         };
 
         const floorsData = {
@@ -2228,6 +2232,16 @@
                     // và ô phía trên (x=68, y=1) đều là tường xanh.
                     fillRect(68, 38, 68, 41, T.WALL);
                     grid[1][68] = T.WALL;
+
+                    // NHÀ KÍNH "VƯỜN RAU BÁC HỒ" trong nhà xe (x=69..74, y=9..17), cửa ra vào ở phía đông (74,13).
+                    for (let gy = 9; gy <= 17; gy++) {
+                        for (let gx = 69; gx <= 74; gx++) {
+                            const edge = gx === 69 || gx === 74 || gy === 9 || gy === 17;
+                            grid[gy][gx] = edge ? T.GH_WALL : T.GH_PATH;
+                        }
+                    }
+                    [70, 72].forEach(bx => [10, 11, 12, 14, 15, 16].forEach(by => { grid[by][bx] = T.GH_BED; }));
+                    grid[13][74] = T.GH_DOOR;
 
                     // Hàng cây + thảm cỏ dọc cạnh trên bản đồ (y=1..2) chạy từ căn tin sang hết nhà xe.
                     fillRect(1, 1, 40, 2, T.TURF_GRASS);
@@ -2745,8 +2759,8 @@
             hasParkingCard: false,
             vehicles: [
                 { id: 'v1', type: 'bike', x: 71.5 * TILE, y: 6.5 * TILE, dir: 'left' },
-                { id: 'v2', type: 'bike', x: 71.5 * TILE, y: 10.5 * TILE, dir: 'left' },
-                { id: 'v3', type: 'scooter', x: 71.5 * TILE, y: 14.5 * TILE, dir: 'left' },
+                { id: 'v2', type: 'bike', x: 77.2 * TILE, y: 8.5 * TILE, dir: 'left' },
+                { id: 'v3', type: 'scooter', x: 77.2 * TILE, y: 16.5 * TILE, dir: 'left' },
                 { id: 'v4', type: 'scooter', x: 71.5 * TILE, y: 18.5 * TILE, dir: 'left' },
                 { id: 'v5', type: 'bike', x: 71.5 * TILE, y: 22.5 * TILE, dir: 'left' },
                 { id: 'v6', type: 'kart', x: 71.5 * TILE, y: 27.5 * TILE, dir: 'left' },
@@ -2811,6 +2825,8 @@
                     tile !== T.MONUMENT &&
                     tile !== T.BIG_TREE &&
                     tile !== T.RED_BLOCK &&
+                    tile !== T.GH_WALL &&
+                    tile !== T.GH_BED &&
                     tile !== T.OUTSIDE
                 );
             }
@@ -2844,6 +2860,8 @@
                 tile === T.PARK_PLAZA ||
                 tile === T.GATE ||
                 tile === T.RED_GATE ||
+                tile === T.GH_PATH ||
+                tile === T.GH_DOOR ||
                 tile === T.CARD_BOOTH
             );
         }
@@ -3051,6 +3069,7 @@
                     if (ptx >= 49 && ptx <= 54 && pty >= 15 && pty <= 31) return { zone: 'Khu Mái Che Chữ A Sân Chính', wing: 'Sân Cờ Trung Tâm (Tầng 1)' };
                     return { zone: 'Sân Trường Trung Tâm', wing: 'Khu Sân Cờ (Tầng 1)' };
                 }
+                if (ptx >= 69 && ptx <= 74 && pty >= 9 && pty <= 17) return { zone: 'Vườn Rau Bác Hồ', wing: 'Nhà Kính • Khu Nhà Xe Học Sinh' };
                 if (ptx >= 68 && ptx <= 85 && pty >= 2 && pty <= 41) return { zone: 'Nhà Xe Học Sinh', wing: 'Khu Ngoại Vi Đông' };
                 if (ptx >= 78 && ptx <= 83 && pty >= 45 && pty <= 49) return { zone: 'Trạm Lấy Thẻ Xe', wing: 'Khu Nhà Xe & Cổng Phụ Đông Nam' };
                 if (ptx >= 77 && ptx <= 83 && pty >= 54 && pty <= 57) return { zone: 'Cổng Phụ Đông Nam', wing: 'Lối Ra Cổng Phụ' };
@@ -4160,6 +4179,20 @@
                     drawPixelTree(x + TILE / 2, y + TILE - 2, 0.72, txSeed(x, y));
                     break;
 
+                case T.GH_WALL:
+                    drawGreenhouseWall(x, y);
+                    break;
+                case T.GH_PATH:
+                    drawGreenhousePath(x, y, tx, ty);
+                    break;
+                case T.GH_DOOR:
+                    drawGreenhousePath(x, y, tx, ty);
+                    ctx.fillStyle = '#e2e8f0'; ctx.fillRect(x, y, TILE, 5); ctx.fillRect(x, y + TILE - 5, TILE, 5);
+                    ctx.fillStyle = '#16a34a'; ctx.fillRect(x + 6, y + 12, 5, TILE - 24);
+                    break;
+                case T.GH_BED:
+                    drawGreenhouseBed(x, y, tx, ty);
+                    break;
                 case T.RED_BLOCK:
                     // Khối đỏ ngăn cách khu này với nhà xe.
                     ctx.fillStyle = '#7f1d1d';
@@ -4290,6 +4323,80 @@
         function drawBigTreeCanopy(tx, ty) {
             const x = tx * TILE, y = ty * TILE;
             drawPixelTree(x + TILE / 2, y + TILE + 2, 1.42, txSeed(tx, ty));
+        }
+
+        // ===== NHÀ KÍNH "VƯỜN RAU BÁC HỒ" =====
+        function drawVeg(kind, cx, cy) {
+            const r = (c, x, y, w, h) => { ctx.fillStyle = c; ctx.fillRect(cx + x, cy + y, w, h); };
+            switch (kind) {
+                case 0: // bắp cải
+                    r('#2b8a3e', -9, -6, 18, 14); r('#51cf66', -7, -8, 14, 12); r('#b2f2bb', -3, -6, 6, 4); break;
+                case 1: // xà lách
+                    r('#37b24d', -9, -3, 18, 10); r('#8ce99a', -7, -7, 14, 8); r('#d3f9d8', -3, -6, 5, 3); break;
+                case 2: // cà chua
+                    r('#2f6b2f', -2, -10, 4, 18); r('#40c057', -8, -8, 16, 6);
+                    r('#e03131', -9, 0, 7, 7); r('#ff6b6b', -8, 1, 3, 3); r('#e03131', 3, -3, 7, 7); r('#ff6b6b', 4, -2, 3, 3); break;
+                case 3: // cà rốt
+                    r('#2f9e44', -6, -10, 4, 9); r('#51cf66', -1, -12, 4, 11); r('#2f9e44', 4, -10, 4, 9);
+                    r('#f08c00', -5, -1, 10, 6); r('#ff922b', -3, 4, 6, 5); break;
+                case 4: // cà tím
+                    r('#2b8a3e', -8, -10, 16, 5); r('#6741d9', -7, -5, 8, 14); r('#845ef7', -6, -4, 3, 6);
+                    r('#6741d9', 2, 0, 7, 10); break;
+                case 5: // ớt
+                    r('#2f9e44', -9, -9, 18, 5); r('#e03131', -7, -4, 3, 12); r('#fa5252', -1, -4, 3, 10); r('#e8590c', 5, -4, 3, 11); break;
+                case 6: // bắp ngô
+                    r('#2f9e44', -2, -12, 4, 22); r('#40c057', -9, -8, 8, 3); r('#40c057', 2, -2, 8, 3);
+                    r('#fcc419', 2, -9, 6, 9); r('#ffe066', 3, -8, 2, 5); break;
+                case 7: // bí ngô
+                    r('#2b8a3e', -9, -7, 8, 5); r('#e8590c', -8, -3, 16, 12); r('#ff922b', -6, -2, 4, 9); r('#ff922b', 1, -2, 4, 9);
+                    r('#5c7c2f', -1, -6, 3, 4); break;
+                default: // dưa leo / đậu
+                    r('#2b8a3e', -9, -9, 18, 6); r('#37b24d', -8, -4, 3, 12); r('#69db7c', 0, -4, 3, 12);
+                    r('#fff3bf', 5, -8, 4, 4); r('#ffd43b', 6, -7, 2, 2); break;
+            }
+        }
+        function drawGreenhouseBed(x, y, tx, ty) {
+            ctx.fillStyle = '#8b5a2b'; ctx.fillRect(x, y, TILE, TILE);
+            ctx.fillStyle = '#a0692f'; ctx.fillRect(x, y, TILE, 3);
+            ctx.fillStyle = '#4a2f1d'; ctx.fillRect(x + 3, y + 3, TILE - 6, TILE - 6);
+            ctx.fillStyle = '#5b3a26';
+            for (let i = 0; i < 3; i++) ctx.fillRect(x + 5, y + 12 + i * 14, TILE - 10, 2);
+            const h = tx * 3 + ty * 7;
+            const spots = [[13, 13], [35, 13], [13, 35], [35, 35]];
+            spots.forEach((s, i) => drawVeg((h + i * 2 + (i > 1 ? 1 : 0)) % 9, x + s[0], y + s[1]));
+        }
+        function drawGreenhouseWall(x, y) {
+            ctx.fillStyle = '#7cc7e0'; ctx.fillRect(x, y, TILE, TILE);
+            ctx.fillStyle = '#bfeaf7'; ctx.fillRect(x + 4, y + 4, TILE - 8, TILE - 8);
+            ctx.fillStyle = 'rgba(255,255,255,.55)';
+            ctx.beginPath(); ctx.moveTo(x + 8, y + TILE - 8); ctx.lineTo(x + 22, y + 6); ctx.lineTo(x + 32, y + 6); ctx.lineTo(x + 18, y + TILE - 8); ctx.closePath(); ctx.fill();
+            ctx.fillRect(x + 34, y + 8, 5, 20);
+            ctx.fillStyle = '#e2e8f0'; ctx.fillRect(x, y, TILE, 4); ctx.fillRect(x, y + TILE - 4, TILE, 4);
+            ctx.fillRect(x, y, 4, TILE); ctx.fillRect(x + TILE - 4, y, 4, TILE);
+            ctx.fillStyle = '#64748b'; ctx.fillRect(x, y + TILE - 2, TILE, 2); ctx.fillRect(x + TILE - 2, y, 2, TILE);
+            ctx.fillStyle = '#94a3b8'; ctx.fillRect(x + TILE / 2 - 1, y + 4, 2, TILE - 8);
+        }
+        function drawGreenhousePath(x, y, tx, ty) {
+            ctx.fillStyle = '#c8a46b'; ctx.fillRect(x, y, TILE, TILE);
+            ctx.fillStyle = '#b78d54';
+            for (let i = 0; i < TILE; i += 12) ctx.fillRect(x, y + i, TILE, 2);
+            ctx.fillStyle = '#d9b97f';
+            ctx.fillRect(x + ((tx * 13 + ty * 7) % 30), y + 4, 8, 2);
+        }
+        // Biển tên đặt phía trên nhà kính.
+        function drawGreenhouseSign() {
+            const x = 69.15 * TILE, y = 7.95 * TILE, w = 5.7 * TILE, h = 0.78 * TILE;
+            ctx.save();
+            ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.fillRect(x + 4, y + h + 2, w, 6);
+            ctx.fillStyle = '#6b4423'; ctx.fillRect(x + 14, y + h - 4, 7, 14); ctx.fillRect(x + w - 21, y + h - 4, 7, 14);
+            ctx.fillStyle = '#14532d'; ctx.fillRect(x, y, w, h);
+            ctx.fillStyle = '#22c55e'; ctx.fillRect(x + 3, y + 3, w - 6, h - 6);
+            ctx.fillStyle = '#166534'; ctx.fillRect(x + 6, y + 6, w - 12, h - 12);
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.font = 'bold 12px "Press Start 2P", monospace';
+            ctx.fillStyle = '#052e16'; ctx.fillText('VƯỜN RAU BÁC HỒ', x + w / 2 + 1, y + h / 2 + 2);
+            ctx.fillStyle = '#fef9c3'; ctx.fillText('VƯỜN RAU BÁC HỒ', x + w / 2, y + h / 2 + 1);
+            ctx.restore();
         }
 
         // Khu sân thu giữa hai tháp WC: 3 cây lớn mỗi bên, thảm cỏ, lối đi giữa có lá rơi.
@@ -4574,6 +4681,7 @@
             }
 
             if (floorNum === 1 && autumnAreaVisible(effCamX, effCamY)) drawAutumnGroundLeaves();
+            if (floorNum === 1 && 76 * TILE > effCamX && 68 * TILE < effCamX + canvas.width && 10 * TILE > effCamY && 7 * TILE < effCamY + canvas.height) drawGreenhouseSign();
 
             // Vẽ vạch sân & lưới bóng chuyền theo chiều Bắc - Nam tại sân phía Tây (x: 17..34, y: 13..32)
             if (floorNum === 1) {
@@ -4920,6 +5028,9 @@
                         miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
                     } else if (t === T.GATE) {
                         miniCtx.fillStyle = '#2563eb';
+                        miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
+                    } else if (t === T.GH_WALL || t === T.GH_BED || t === T.GH_PATH || t === T.GH_DOOR) {
+                        miniCtx.fillStyle = t === T.GH_WALL ? '#38bdf8' : (t === T.GH_BED ? '#16a34a' : '#d6c7a1');
                         miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
                     } else if (t === T.RED_BLOCK || t === T.RED_GATE) {
                         miniCtx.fillStyle = t === T.RED_BLOCK ? '#dc2626' : '#f87171';
