@@ -2167,10 +2167,7 @@
                     fillRect(0, 0, 0, MAP_H - 1, T.WALL);
                     fillRect(MAP_W - 1, 0, MAP_W - 1, MAP_H - 1, T.WALL);
 
-                    // Decorative Trees along left perimeter
-                    for (let ty = 3; ty <= MAP_H - 4; ty += 5) {
-                        grid[ty][1] = T.TREE;
-                    }
+                    // (Đã xóa hàng cây dọc mép trái cạnh sân bóng đá / nhà thi đấu.)
 
                     // 1. TOP-LEFT: CĂN TIN & LỐI ĐI MỞ
                     fillRect(4, 3, 30, 10, T.ROOM_FLOOR);
@@ -2227,13 +2224,15 @@
                     // Không dựng tường phía sau dãy lớp A1-A6.
                     fillRect(68, 2, 68, 41, T.WALL);
 
-                    // HÌNH 1: xóa đoạn tường phía dưới (x=68, y=38..41) và mở cửa đỏ cho xe/người ra vào.
-                    // Hai đầu cửa vẫn là tường xanh.
-                    fillRect(68, 38, 68, 41, T.RED_GATE);
-                    grid[37][68] = T.WALL;
-                    // HÌNH 3: mở cửa đỏ ở đầu tường phía trên (x=68, y=1) đầu tường phía trên vẫn là tường xanh.
-                    grid[1][68] = T.RED_GATE;
-                    grid[2][68] = T.WALL;
+                    // Tường xanh ngăn nhà xe kín hoàn toàn: đoạn phía dưới (x=68, y=38..41)
+                    // và ô phía trên (x=68, y=1) đều là tường xanh.
+                    fillRect(68, 38, 68, 41, T.WALL);
+                    grid[1][68] = T.WALL;
+
+                    // Hàng cây + thảm cỏ dọc cạnh trên bản đồ (y=1..2) chạy từ căn tin sang hết nhà xe.
+                    fillRect(1, 1, 40, 2, T.TURF_GRASS);
+                    fillRect(63, 1, 67, 2, T.TURF_GRASS);
+                    fillRect(69, 1, 91, 1, T.TURF_GRASS);
 
                     // HÌNH 4: khoảng sân giữa hai tháp WC (x=41..62, y=1..7):
                     // hai thảm cỏ (trên và dưới) có cây cao, lối đi giữa (y=3..5) trải lá rụng.
@@ -2372,6 +2371,8 @@
 
                     fillRect(41, 32, 62, 41, T.CORRIDOR);
                     buildRoom(41, 34, 46, 36, 'PHÒNG TRUYỀN THỐNG', 'top', 'truyen_thong', 'Khu Hành Chính (Tầng 1)');
+                    // Bít ô hở giữa cầu thang Tây Nam và góc phòng truyền thống (x=41, y=37).
+                    grid[37][41] = T.WALL;
                     halls.push({ x1: 41, y1: 38, x2: 58, y2: 40, label: 'SẢNH CHÍNH', isStage: true });
                     buildRoom(55, 34, 57, 36, 'GIÁM THỊ', 'top', 'giam_thi', 'Khu Hành Chính (Tầng 1)');
                     buildRoom(58, 34, 62, 36, 'TƯ VẤN HỌC ĐƯỜNG', 'top', 'tu_van', 'Khu Hành Chính (Tầng 1)');
@@ -2822,7 +2823,7 @@
                 ];
                 if (planterRects.some(rect => worldX >= rect.x1 && worldX <= rect.x2 && worldY >= rect.y1 && worldY <= rect.y2)) return false;
                 // Thân 6 cây lớn ở sân thu giữa hai tháp WC là vật cản.
-                if (AUTUMN_TREES.some(tr => Math.abs(worldX - tr.x * TILE) <= 0.42 * TILE && worldY <= tr.y * TILE && worldY >= (tr.y - 0.7) * TILE)) return false;
+                if (ALL_AUTUMN_TREES.some(tr => Math.abs(worldX - tr.x * TILE) <= 0.42 * TILE && worldY <= tr.y * TILE && worldY >= (tr.y - 0.7) * TILE)) return false;
             }
 
             return (
@@ -4297,6 +4298,13 @@
             { x: 45.0, y: 7.8 }, { x: 51.5, y: 7.8 }, { x: 58.0, y: 7.8 }
         ];
         const AUTUMN_TREE_SCALE = 1.05;
+        // Hàng cây dọc cạnh trên bản đồ (cùng kiểu với khu sân thu), chạy từ căn tin sang hết nhà xe.
+        const ROW_TREES = [
+            { x: 6.0, y: 2.8 }, { x: 12.5, y: 2.8 }, { x: 19.0, y: 2.8 }, { x: 25.5, y: 2.8 }, { x: 32.0, y: 2.8 }, { x: 38.5, y: 2.8 },
+            { x: 64.5, y: 2.8 },
+            { x: 71.0, y: 1.9 }, { x: 77.5, y: 1.9 }, { x: 84.0, y: 1.9 }, { x: 90.0, y: 1.9 }
+        ];
+        const ALL_AUTUMN_TREES = AUTUMN_TREES.concat(ROW_TREES);
         const AUTUMN_AREA = { x1: 41, y1: 1, x2: 62, y2: 7 };
         const LEAF_COLORS = ['#ea580c', '#f59e0b', '#dc2626', '#b45309', '#eab308', '#a16207'];
         function leafHash(n) {
@@ -4598,11 +4606,11 @@
                 const bedW = 1.15 * TILE;
                 entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 76.15 * TILE, bedY, bedW, bedH, 1) });
                 entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 84.05 * TILE, bedY, bedW, bedH, 3) });
-                if (autumnAreaVisible(effCamX, effCamY)) {
-                    AUTUMN_TREES.forEach((tr, i) => {
-                        entities.push({ y: tr.y * TILE, draw: () => drawPixelTree(tr.x * TILE, tr.y * TILE, AUTUMN_TREE_SCALE, txSeed(i * 97 + 11, 5)) });
-                    });
-                }
+                ALL_AUTUMN_TREES.forEach((tr, i) => {
+                    const sx = tr.x * TILE, sy = tr.y * TILE;
+                    if (sx < effCamX - 5 * TILE || sx > effCamX + canvas.width + 5 * TILE || sy < effCamY - 2 * TILE || sy > effCamY + canvas.height + 6 * TILE) return;
+                    entities.push({ y: sy, draw: () => drawPixelTree(sx, sy, AUTUMN_TREE_SCALE, txSeed(i * 97 + 11, 5)) });
+                });
                 state.vehicles.forEach(veh => {
                     if (state.mountedVehicle === veh) return;
                     entities.push({
