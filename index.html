@@ -2073,7 +2073,9 @@
             VOLLEYBALL_COURT: 27,
             TEACHER_SET: 28,
             BADMINTON_COURT: 29,
-            PICKLEBALL_COURT: 30
+            PICKLEBALL_COURT: 30,
+            RED_BLOCK: 31,
+            RED_GATE: 32
         };
 
         const floorsData = {
@@ -2224,6 +2226,19 @@
                     // Chỉ dựng tường dọc ngăn cách nhà xe với khu cầu thang Đông Bắc.
                     // Không dựng tường phía sau dãy lớp A1-A6.
                     fillRect(68, 2, 68, 41, T.WALL);
+
+                    // HÌNH 1: xóa đoạn tường phía dưới (x=68, y=38..41) và mở cửa đỏ cho xe/người ra vào.
+                    // Hai đầu cửa vẫn là tường xanh.
+                    fillRect(68, 38, 68, 41, T.RED_GATE);
+                    grid[37][68] = T.WALL;
+                    // HÌNH 3: mở cửa đỏ ở đầu tường phía trên (x=68, y=1) đầu tường phía trên vẫn là tường xanh.
+                    grid[1][68] = T.RED_GATE;
+                    grid[2][68] = T.WALL;
+
+                    // HÌNH 4: khoảng sân giữa hai tháp WC (x=41..62, y=1..7):
+                    // hai thảm cỏ (trên và dưới) có cây cao, lối đi giữa (y=3..5) trải lá rụng.
+                    fillRect(41, 1, 62, 2, T.TURF_GRASS);
+                    fillRect(41, 6, 62, 7, T.TURF_GRASS);
 
                     // 8. MỞ RỘNG GÓC ĐÔNG NAM
                     for (let ty = 43; ty <= 53; ty++) {
@@ -2794,6 +2809,7 @@
                     tile !== T.RAILING &&
                     tile !== T.MONUMENT &&
                     tile !== T.BIG_TREE &&
+                    tile !== T.RED_BLOCK &&
                     tile !== T.OUTSIDE
                 );
             }
@@ -2805,6 +2821,8 @@
                     { x1: 84.05 * TILE, y1: 44.25 * TILE, x2: 85.20 * TILE, y2: 50.60 * TILE }
                 ];
                 if (planterRects.some(rect => worldX >= rect.x1 && worldX <= rect.x2 && worldY >= rect.y1 && worldY <= rect.y2)) return false;
+                // Thân 6 cây lớn ở sân thu giữa hai tháp WC là vật cản.
+                if (AUTUMN_TREES.some(tr => Math.abs(worldX - tr.x * TILE) <= 0.42 * TILE && worldY <= tr.y * TILE && worldY >= (tr.y - 0.7) * TILE)) return false;
             }
 
             return (
@@ -2824,6 +2842,7 @@
                 tile === T.GARAGE_FLOOR ||
                 tile === T.PARK_PLAZA ||
                 tile === T.GATE ||
+                tile === T.RED_GATE ||
                 tile === T.CARD_BOOTH
             );
         }
@@ -4140,6 +4159,40 @@
                     drawPixelTree(x + TILE / 2, y + TILE - 2, 0.72, txSeed(x, y));
                     break;
 
+                case T.RED_BLOCK:
+                    // Khối đỏ ngăn cách khu này với nhà xe.
+                    ctx.fillStyle = '#7f1d1d';
+                    ctx.fillRect(x, y, TILE, TILE);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 10);
+                    ctx.fillStyle = '#fca5a5';
+                    ctx.fillRect(x + 2, y + 2, TILE - 4, 5);
+                    ctx.fillStyle = 'rgba(255,255,255,.55)';
+                    for (let s = 6; s < TILE - 8; s += 14) ctx.fillRect(x + s, y + 14, 7, 12);
+                    break;
+
+                case T.RED_GATE: {
+                    // Cửa đỏ sáng: nền đi được, hai thanh đỏ phát sáng ở hai mép cửa.
+                    ctx.fillStyle = (ty <= 2) ? (((tx + ty) % 2 === 0) ? '#a1a1aa' : '#9ca3af') : (((tx + ty) % 2 === 0) ? '#cbd5e1' : '#dbeafe');
+                    ctx.fillRect(x, y, TILE, TILE);
+                    const glow = 0.55 + 0.35 * Math.sin(performance.now() / 260);
+                    ctx.fillStyle = 'rgba(239,68,68,' + (0.16 + glow * 0.14).toFixed(3) + ')';
+                    ctx.fillRect(x, y, TILE, TILE);
+                    ctx.fillStyle = '#991b1b';
+                    if (ty <= 2) {
+                        ctx.fillRect(x, y, TILE, 8); ctx.fillRect(x, y + TILE - 8, TILE, 8);
+                        ctx.fillStyle = '#ef4444';
+                        ctx.fillRect(x, y + 2, TILE, 4); ctx.fillRect(x, y + TILE - 6, TILE, 4);
+                    } else {
+                        ctx.fillRect(x, y, 8, TILE); ctx.fillRect(x + TILE - 8, y, 8, TILE);
+                        ctx.fillStyle = '#ef4444';
+                        ctx.fillRect(x + 2, y, 4, TILE); ctx.fillRect(x + TILE - 6, y, 4, TILE);
+                    }
+                    ctx.fillStyle = 'rgba(254,202,202,' + glow.toFixed(3) + ')';
+                    ctx.fillRect(x + TILE / 2 - 3, y + TILE / 2 - 3, 6, 6);
+                    break;
+                }
+
                 case T.BIG_TREE:
                     ctx.fillStyle = '#a1a1aa';
                     ctx.fillRect(x, y, TILE, TILE);
@@ -4236,6 +4289,65 @@
         function drawBigTreeCanopy(tx, ty) {
             const x = tx * TILE, y = ty * TILE;
             drawPixelTree(x + TILE / 2, y + TILE + 2, 1.42, txSeed(tx, ty));
+        }
+
+        // Khu sân thu giữa hai tháp WC: 3 cây lớn mỗi bên, thảm cỏ, lối đi giữa có lá rơi.
+        const AUTUMN_TREES = [
+            { x: 45.0, y: 2.8 }, { x: 51.5, y: 2.8 }, { x: 58.0, y: 2.8 },
+            { x: 45.0, y: 7.8 }, { x: 51.5, y: 7.8 }, { x: 58.0, y: 7.8 }
+        ];
+        const AUTUMN_TREE_SCALE = 1.05;
+        const AUTUMN_AREA = { x1: 41, y1: 1, x2: 62, y2: 7 };
+        const LEAF_COLORS = ['#ea580c', '#f59e0b', '#dc2626', '#b45309', '#eab308', '#a16207'];
+        function leafHash(n) {
+            let v = (n * 2654435761) >>> 0;
+            v = Math.imul(v ^ (v >>> 15), 2246822519) >>> 0;
+            return ((v ^ (v >>> 13)) >>> 0) / 4294967295;
+        }
+        function drawLeaf(x, y, rot, size, color) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rot);
+            ctx.fillStyle = color;
+            ctx.fillRect(-size, -size * 0.5, size * 2, size);
+            ctx.fillRect(-size * 0.5, -size * 0.9, size, size * 1.8);
+            ctx.fillStyle = 'rgba(69,26,3,.55)';
+            ctx.fillRect(-size, -1, size * 2, 2);
+            ctx.restore();
+        }
+        function autumnAreaVisible(effCamX, effCamY) {
+            const ax1 = AUTUMN_AREA.x1 * TILE, ay1 = 0, ax2 = (AUTUMN_AREA.x2 + 1) * TILE, ay2 = (AUTUMN_AREA.y2 + 2) * TILE;
+            return !(ax2 < effCamX || ax1 > effCamX + canvas.width || ay2 < effCamY || ay1 > effCamY + canvas.height);
+        }
+        // Lá đã rụng chỉ nằm trên lối đi giữa (y=3..6), nhiều hơn ở dưới các tán cây.
+        function drawAutumnGroundLeaves() {
+            for (let i = 0; i < 170; i++) {
+                const tr = AUTUMN_TREES[Math.floor(leafHash(i * 3 + 1) * AUTUMN_TREES.length)];
+                const near = leafHash(i * 3 + 2) < 0.6;
+                const px = near ? (tr.x + (leafHash(i * 3 + 7) - 0.5) * 5.5) * TILE
+                                : (AUTUMN_AREA.x1 + leafHash(i * 3 + 7) * (AUTUMN_AREA.x2 - AUTUMN_AREA.x1 + 1)) * TILE;
+                const py = (3.05 + leafHash(i * 3 + 3) * 2.9) * TILE;
+                drawLeaf(px, py, leafHash(i * 5 + 9) * Math.PI, 3 + leafHash(i * 11 + 4) * 2.5, LEAF_COLORS[i % LEAF_COLORS.length]);
+            }
+        }
+        // Lá rơi từ tán các cây cao xuống lối đi giữa rồi lặp lại (vẽ trên cùng).
+        function drawAutumnFallingLeaves(timeSec) {
+            for (let i = 0; i < 60; i++) {
+                const tr = AUTUMN_TREES[i % AUTUMN_TREES.length];
+                const period = 6 + leafHash(i * 13 + 1) * 6;
+                const ph = leafHash(i * 13 + 2);
+                const prog = ((timeSec / period) + ph) % 1;
+                const bx = (tr.x + (leafHash(i * 13 + 3) - 0.5) * 4.6) * TILE;
+                const startY = Math.max(0.5, tr.y - 3.2) * TILE;
+                const endY = (3.4 + leafHash(i * 13 + 5) * 2.4) * TILE;
+                const x = bx + Math.sin(prog * Math.PI * 4 + ph * 9) * 22;
+                const y = startY + prog * (endY - startY);
+                const a = prog < 0.08 ? prog / 0.08 : (prog > 0.92 ? (1 - prog) / 0.08 : 1);
+                ctx.save();
+                ctx.globalAlpha *= Math.max(0, a);
+                drawLeaf(x, y, prog * 9 + ph * 6, 3 + leafHash(i * 13 + 4) * 2, LEAF_COLORS[i % LEAF_COLORS.length]);
+                ctx.restore();
+            }
         }
 
         /**
@@ -4453,6 +4565,8 @@
                 }
             }
 
+            if (floorNum === 1 && autumnAreaVisible(effCamX, effCamY)) drawAutumnGroundLeaves();
+
             // Vẽ vạch sân & lưới bóng chuyền theo chiều Bắc - Nam tại sân phía Tây (x: 17..34, y: 13..32)
             if (floorNum === 1) {
                 drawVolleyballCourtMarkings(ctx, 17, 13, 34, 32);
@@ -4484,6 +4598,11 @@
                 const bedW = 1.15 * TILE;
                 entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 76.15 * TILE, bedY, bedW, bedH, 1) });
                 entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 84.05 * TILE, bedY, bedW, bedH, 3) });
+                if (autumnAreaVisible(effCamX, effCamY)) {
+                    AUTUMN_TREES.forEach((tr, i) => {
+                        entities.push({ y: tr.y * TILE, draw: () => drawPixelTree(tr.x * TILE, tr.y * TILE, AUTUMN_TREE_SCALE, txSeed(i * 97 + 11, 5)) });
+                    });
+                }
                 state.vehicles.forEach(veh => {
                     if (state.mountedVehicle === veh) return;
                     entities.push({
@@ -4563,6 +4682,7 @@
 
             entities.sort((a, b) => a.y - b.y);
             entities.forEach(ent => ent.draw());
+            if (floorNum === 1 && autumnAreaVisible(effCamX, effCamY)) drawAutumnFallingLeaves(timeSec);
 
             // Mái che chữ A màu đỏ ở khu vực trung tâm sân chính với kỹ thuật Roof Fade
             if (floorNum === 1) {
@@ -4792,6 +4912,9 @@
                         miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
                     } else if (t === T.GATE) {
                         miniCtx.fillStyle = '#2563eb';
+                        miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
+                    } else if (t === T.RED_BLOCK || t === T.RED_GATE) {
+                        miniCtx.fillStyle = t === T.RED_BLOCK ? '#dc2626' : '#f87171';
                         miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
                     } else if (t === T.STAGE) {
                         miniCtx.fillStyle = '#991b1b';
