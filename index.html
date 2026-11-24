@@ -2189,8 +2189,9 @@
                             }
                         });
                     });
-                    fillRect(31, 5, 35, 10, T.CAMPUS_GROUND);
-                    halls.push({ x1: 31, y1: 7, x2: 34, y2: 8, label: 'LỐI VÀO', isZoneLabel: true });
+                    // Mở rộng nền CĂN TIN sang hết phần vùng đỏ (bên dưới lớp B4).
+                    // Các phòng B2-B4 được dựng sau nên không bị nền căn tin đè lên.
+                    fillRect(31, 5, 35, 10, T.ROOM_FLOOR);
 
                     // Dãy lớp B2-B4: bố trí đúng khu vực người dùng đánh dấu
                     // phía trên lối vào, sát khu căn tin. Cửa lớp quay xuống lối đi.
@@ -2204,7 +2205,19 @@
                     // 3. CENTER-LEFT: SÂN BÓNG CHUYỀN (X = 17 → 34, Y = 13 → 32) NỀN NGẢ VÀNG CÁT, LƯỚI CHIỀU BẮC - NAM
                     fillRect(17, 13, 34, 32, T.VOLLEYBALL_COURT);
                     halls.push({ x1: 17, y1: 13, x2: 34, y2: 14, label: 'SÂN BÓNG CHUYỀN', isZoneLabel: true });
+
+                    // Lối đi màu xanh phía dưới căn tin: giữ một ô thông thoáng ở giữa.
+                    // Bổ sung hai ghế nữa (tổng cộng bốn ghế) dọc hai bên lối đi.
+                    fillRect(31, 11, 35, 12, T.CAMPUS_GROUND);
+                    grid[12][31] = T.BENCH;
+                    grid[12][32] = T.BENCH;
+                    grid[12][34] = T.BENCH;
+                    grid[12][35] = T.BENCH;
+
                     fillRect(35, 3, 35, 45, T.CAMPUS_GROUND);
+                    // Tường chắn liên tục ở mép sân sau; đặt SAU lối đi dọc để
+                    // không bị lệnh vẽ nền phía trên ghi đè và tạo khe đi lọt ra ngoài.
+                    fillRect(31, 13, 35, 13, T.WALL);
 
                     // 4. BOTTOM-LEFT: Sân Bóng Đá Cỏ Nhân Tạo
                     fillRect(2, 38, 16, 50, T.TURF_GRASS);
