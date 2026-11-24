@@ -2206,18 +2206,12 @@
                     fillRect(17, 13, 34, 32, T.VOLLEYBALL_COURT);
                     halls.push({ x1: 17, y1: 13, x2: 34, y2: 14, label: 'SÂN BÓNG CHUYỀN', isZoneLabel: true });
 
-                    // Lối đi màu xanh phía dưới căn tin: giữ một ô thông thoáng ở giữa.
-                    // Bổ sung hai ghế nữa (tổng cộng bốn ghế) dọc hai bên lối đi.
-                    fillRect(31, 11, 35, 12, T.CAMPUS_GROUND);
-                    grid[12][31] = T.BENCH;
-                    grid[12][32] = T.BENCH;
-                    grid[12][34] = T.BENCH;
-                    grid[12][35] = T.BENCH;
+                    // Xóa cụm ghế và đoạn tường cũ phía dưới căn tin theo yêu cầu.
+                    fillRect(31, 11, 35, 13, T.CAMPUS_GROUND);
 
                     fillRect(35, 3, 35, 45, T.CAMPUS_GROUND);
-                    // Tường chắn liên tục ở mép sân sau; đặt SAU lối đi dọc để
-                    // không bị lệnh vẽ nền phía trên ghi đè và tạo khe đi lọt ra ngoài.
-                    fillRect(31, 13, 35, 13, T.WALL);
+                    // Dựng bức tường mới tại vị trí người dùng đánh dấu màu xanh lá.
+                    fillRect(35, 13, 40, 13, T.WALL);
 
                     // 4. BOTTOM-LEFT: Sân Bóng Đá Cỏ Nhân Tạo
                     fillRect(2, 38, 16, 50, T.TURF_GRASS);
