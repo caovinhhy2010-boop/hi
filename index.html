@@ -425,6 +425,11 @@
             .hotbar-slot { width:38px; min-width:38px; height:38px; min-height:38px; }
         }
     </style>
+
+<style id="nvc-world-chat-style">
+#nvcWorldChatBtn{position:fixed;right:18px;bottom:92px;z-index:9000;background:#174a75;color:#fff;border:2px solid #8bd5ff;border-radius:10px;padding:9px 13px;font-weight:800;box-shadow:0 4px 0 #092e4a;cursor:pointer}#nvcWorldChat{position:fixed;right:18px;bottom:148px;width:min(340px,calc(100vw - 28px));height:390px;max-height:60vh;z-index:9001;display:none;background:#102338;border:3px solid #65c8ed;border-radius:12px;color:white;box-shadow:0 8px 30px #0008;overflow:hidden;font-family:inherit}#nvcWorldChat.open{display:flex;flex-direction:column}#nvcWorldChat header{padding:9px 11px;background:#174a75;font-weight:bold;display:flex;justify-content:space-between;align-items:center}#nvcWorldChatLog{overflow:auto;flex:1;padding:10px;display:flex;flex-direction:column;gap:7px;font-size:13px}#nvcWorldChatLog .wc-msg{background:#203a53;border-radius:8px;padding:6px 8px;overflow-wrap:anywhere}#nvcWorldChatLog .wc-name{font-weight:bold;color:#a8e8ff;margin-right:5px}#nvcWorldChatLog .wc-time{font-size:10px;color:#9db5c8;margin-left:6px}#nvcWorldChat form{display:flex;gap:6px;padding:8px;border-top:1px solid #38627d}#nvcWorldChatInput{min-width:0;flex:1;color:#fff;background:#071a2a;border:1px solid #51738c;border-radius:6px;padding:7px}#nvcWorldChat form button{background:#1d78b5;color:white;border-radius:6px;padding:6px 10px;font-weight:bold}#nvcWorldChatStatus{font-size:10px;color:#9fc9dd;padding:0 10px 5px}@media(max-width:600px){#nvcWorldChatBtn{right:10px;bottom:80px;padding:8px 10px}#nvcWorldChat{right:8px;bottom:132px;width:calc(100vw - 16px);height:45vh}}
+</style>
+
 </head>
 <body class="relative w-screen h-screen overflow-hidden text-white">
 
@@ -5688,6 +5693,7 @@
                 });
 
                 multiplayer.channel
+                    .on('broadcast', { event: 'world-chat' }, ({ payload }) => { window.dispatchEvent(new CustomEvent('nvc-world-chat-message', { detail: payload })); })
                     .on('broadcast', { event: 'player-state' }, ({ payload }) => {
                         const remote = sanitizeRemotePlayer(payload && payload.player);
                         if (remote) {
@@ -6713,5 +6719,16 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
             requestAnimationFrame(gameLoop);
         };
     </script>
+
+<button id="nvcWorldChatBtn" type="button">🌐 Chat thế giới</button>
+<section id="nvcWorldChat" aria-label="Chat thế giới">
+<header><span>🌐 CHAT THẾ GIỚI</span><button id="nvcWorldChatClose" type="button" aria-label="Đóng">✕</button></header>
+<div id="nvcWorldChatLog" aria-live="polite"></div><div id="nvcWorldChatStatus">Tin nhắn chỉ gửi khi đang kết nối thế giới chung.</div>
+<form id="nvcWorldChatForm"><input id="nvcWorldChatInput" maxlength="180" autocomplete="off" placeholder="Nhắn mọi người..."/><button type="submit">Gửi</button></form>
+</section>
+<script id="nvc-world-chat-script">
+(()=>{const btn=document.getElementById('nvcWorldChatBtn'),panel=document.getElementById('nvcWorldChat'),close=document.getElementById('nvcWorldChatClose'),log=document.getElementById('nvcWorldChatLog'),form=document.getElementById('nvcWorldChatForm'),input=document.getElementById('nvcWorldChatInput'),status=document.getElementById('nvcWorldChatStatus');if(!btn)return;let history=[];try{history=JSON.parse(localStorage.getItem('nvc_world_chat_history')||'[]')}catch{};function render(m){const row=document.createElement('div');row.className='wc-msg';const n=document.createElement('span');n.className='wc-name';n.textContent=(m.name||'Người chơi')+':';const c=document.createElement('span');c.textContent=m.text||'';const t=document.createElement('span');t.className='wc-time';t.textContent=m.time||'';row.append(n,c,t);log.append(row);log.scrollTop=log.scrollHeight;}history.slice(-40).forEach(render);function save(m){history.push(m);history=history.slice(-40);try{localStorage.setItem('nvc_world_chat_history',JSON.stringify(history))}catch{}render(m)}btn.onclick=()=>panel.classList.toggle('open');close.onclick=()=>panel.classList.remove('open');form.addEventListener('submit',async e=>{e.preventDefault();const text=input.value.trim();if(!text)return;const mp=(typeof multiplayer!=='undefined'?multiplayer:null);if(!mp||!mp.connected||!mp.channel){status.textContent='Bạn cần kết nối thế giới chung để gửi tin nhắn.';return;}const m={name:(typeof safePlayerName==='function'?safePlayerName():'Người chơi'),text,time:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),id:mp.playerId};try{await mp.channel.send({type:'broadcast',event:'world-chat',payload:m});save(m);input.value='';status.textContent='Đã gửi vào chat thế giới.'}catch{status.textContent='Gửi tin nhắn thất bại, thử lại nhé.'}});window.addEventListener('nvc-world-chat-message',e=>{const m=e.detail;if(m&&m.text&&m.id!==(typeof multiplayer!=='undefined'?multiplayer.playerId:null))save(m)});})();
+</script>
+
 </body>
 </html>
