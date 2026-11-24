@@ -920,6 +920,24 @@
       <div class="w-full max-w-xl bg-slate-950 border-4 border-amber-300 rounded-2xl p-3"><div class="flex justify-between items-center mb-2"><b id="photoViewAuthor" class="text-cyan-200">Ảnh trên bản đồ</b><button id="photoViewClose" class="text-2xl px-2">✕</button></div><img id="photoViewImage" class="w-full max-h-[65vh] object-contain rounded-lg bg-slate-900" alt="Ảnh Locket"><p id="photoViewCaption" class="text-white mt-2"></p><div id="photoViewPlace" class="text-xs text-slate-400 mt-1"></div><div id="photoViewFriendNote" class="hidden text-xs text-cyan-300 mt-2">🌍 Ảnh công khai — mọi người trong thế giới NVC đều có thể xem</div><button id="deleteMyPhotoBtn" class="hidden pixel-btn bg-rose-700 border-2 border-rose-300 rounded-lg px-4 py-2 mt-3">🗑️ Gỡ ảnh của mình</button></div>
     </div>
 
+
+        <div class="p-3 sm:p-4 overflow-y-auto flex-1">
+          <div class="flex gap-2 flex-wrap mb-3">
+            <button id="noticeAddToggle" class="rounded-lg bg-emerald-700 text-white font-bold px-3 py-2">＋ Thêm thông báo</button>
+            <span class="text-xs text-amber-900 self-center">Thông báo lưu trên trình duyệt này.</span>
+          </div>
+          <form id="noticeEditor" class="hidden bg-white border-2 border-amber-300 rounded-lg p-3 mb-4 space-y-2">
+            <input id="noticeTitle" maxlength="80" required placeholder="Tiêu đề thông báo" class="w-full border rounded p-2 text-slate-900"/>
+            <select id="noticeCategory" class="w-full border rounded p-2 text-slate-900"><option>Thông tin</option><option>Sự kiện</option><option>Đoàn - Hội</option><option>Câu lạc bộ</option><option>Học tập</option><option>Khẩn</option></select>
+            <textarea id="noticeBody" maxlength="1000" required rows="4" placeholder="Nội dung thông báo / thông tin..." class="w-full border rounded p-2 text-slate-900 resize-y"></textarea>
+            <div class="flex gap-2"><button type="submit" class="rounded bg-blue-700 text-white font-bold px-4 py-2">Đăng</button><button type="button" id="noticeCancel" class="rounded bg-slate-500 text-white px-4 py-2">Hủy</button></div>
+          </form>
+          <div id="noticeList" class="space-y-3"></div>
+        </div>
+        <div class="bg-amber-100 border-t border-amber-300 px-3 py-2 text-xs text-amber-900">Nhấn E khi đứng gần bảng trong phòng Đoàn - Hội để mở.</div>
+      </div>
+    </div>
+
     <script>
         /**
          * ============================================================================
@@ -3296,7 +3314,6 @@
                     obstacles: [
                         { x: 42, y: 52, w: 150, h: 170, kind: 'grey_cabinet' },
                         { x: 728, y: 52, w: 150, h: 170, kind: 'grey_cabinet' },
-                        { x: 270, y: 70, w: 380, h: 28, kind: 'notice_board' },
                         { x: 250, y: 168, w: 420, h: 86, kind: 'wood_table' },
                         { x: 292, y: 126, w: 48, h: 38, kind: 'dark_chair' },
                         { x: 426, y: 126, w: 48, h: 38, kind: 'dark_chair' },
@@ -3868,19 +3885,6 @@
                                     ctx.lineWidth = 1.5;
                                     ctx.strokeRect(gx, b.y + 14, 10, 18);
                                 });
-                            }
-                        } else if (b.kind === 'notice_board') {
-                            ctx.fillStyle = '#78350f';
-                            ctx.fillRect(b.x - 5, b.y - 5, b.w + 10, b.h + 10);
-                            ctx.fillStyle = '#0f766e';
-                            ctx.fillRect(b.x, b.y, b.w, b.h);
-                            ctx.fillStyle = '#fef3c7';
-                            ctx.font = 'bold 14px sans-serif';
-                            ctx.textAlign = 'center';
-                            ctx.fillText('BẢNG TIN ĐOÀN - HỘI & CÂU LẠC BỘ', b.x + b.w / 2, b.y + 19);
-                            for (let i = 0; i < 5; i++) {
-                                ctx.fillStyle = ['#fde68a','#bfdbfe','#fecdd3','#bbf7d0','#ddd6fe'][i];
-                                ctx.fillRect(b.x + 16 + i * 72, b.y + 24, 56, 3);
                             }
                         } else if (b.kind === 'plant') {
                             ctx.fillStyle = 'rgba(15,23,42,.18)';
@@ -4761,6 +4765,30 @@
 
             if (floorNum === 1) {
                 entities.push({ y: 51.5*TILE, draw: () => drawNVCMonument(ctx, timeSec) });
+                // Hai mô hình biểu trưng đỏ đặt hai bên sân khấu, lấy cảm hứng từ ảnh người dùng.
+                const drawStageEmblem = (cx, footY, mirror, slogan) => {
+                    ctx.save(); ctx.translate(cx, footY); if (mirror) ctx.scale(-1, 1);
+                    const w = 1.52*TILE, h = 3.15*TILE;
+                    // Bệ đỡ kim loại xám
+                    ctx.fillStyle = '#64748b'; ctx.strokeStyle = '#111827'; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.moveTo(-w*.48, -4); ctx.lineTo(-w*.38, -h*.06); ctx.lineTo(w*.38, -h*.06); ctx.lineTo(w*.48, -4); ctx.closePath(); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#9ca3af'; ctx.fillRect(-w*.38, -h*.07, w*.76, 7);
+                    // Ngọn lửa đỏ pixel-stepped phía sau tấm bảng
+                    ctx.fillStyle = '#8f1010'; ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.moveTo(-w*.42,-h*.12); ctx.lineTo(-w*.56,-h*.30); ctx.lineTo(-w*.52,-h*.48); ctx.lineTo(-w*.40,-h*.65); ctx.lineTo(-w*.32,-h*.88); ctx.lineTo(-w*.18,-h*.98); ctx.lineTo(-w*.14,-h*.82); ctx.lineTo(-w*.03,-h*.70); ctx.lineTo(w*.10,-h*.84); ctx.lineTo(w*.18,-h*.97); ctx.lineTo(w*.27,-h*.90); ctx.lineTo(w*.32,-h*.70); ctx.lineTo(w*.40,-h*.50); ctx.lineTo(w*.48,-h*.32); ctx.lineTo(w*.40,-h*.13); ctx.closePath(); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#ed2020'; ctx.beginPath(); ctx.moveTo(-w*.34,-h*.14); ctx.lineTo(-w*.47,-h*.32); ctx.lineTo(-w*.40,-h*.49); ctx.lineTo(-w*.29,-h*.68); ctx.lineTo(-w*.22,-h*.88); ctx.lineTo(-w*.11,-h*.77); ctx.lineTo(w*.02,-h*.61); ctx.lineTo(w*.13,-h*.79); ctx.lineTo(w*.22,-h*.89); ctx.lineTo(w*.30,-h*.69); ctx.lineTo(w*.36,-h*.49); ctx.lineTo(w*.39,-h*.31); ctx.lineTo(w*.30,-h*.14); ctx.closePath(); ctx.fill();
+                    // Tấm bảng trắng với viền pixel đen
+                    ctx.fillStyle = '#f4eee8'; ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.moveTo(-w*.31,-h*.16); ctx.lineTo(-w*.31,-h*.55); ctx.lineTo(-w*.22,-h*.64); ctx.lineTo(w*.23,-h*.64); ctx.lineTo(w*.32,-h*.55); ctx.lineTo(w*.32,-h*.16); ctx.lineTo(w*.25,-h*.10); ctx.lineTo(-w*.25,-h*.10); ctx.closePath(); ctx.fill(); ctx.stroke();
+                    ctx.save(); ctx.scale(mirror ? -1 : 1,1); ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#b91c1c'; ctx.font='bold 10px "Press Start 2P", monospace';
+                    const lines = slogan.split('|'); lines.forEach((line,i)=>ctx.fillText(line,0,-h*.43+i*13)); ctx.restore();
+                    // Hoa hồng pixel ở chân
+                    const flower=(fx,fy,color)=>{ctx.fillStyle=color;ctx.fillRect(fx-4,fy-5,8,8);ctx.fillRect(fx-8,fy-1,6,6);ctx.fillRect(fx+2,fy-1,6,6);ctx.fillRect(fx-3,fy+3,6,6);ctx.fillStyle='#2f8b48';ctx.fillRect(fx-1,fy+8,3,9);ctx.fillRect(fx-6,fy+10,5,3);};
+                    flower(-w*.23,-h*.14,'#f472b6'); flower(-w*.08,-h*.13,'#fb7185'); flower(w*.15,-h*.14,'#f9a8d4');
+                    ctx.restore();
+                };
+                entities.push({ y: 15.1*TILE, draw: () => drawStageEmblem(47.2*TILE, 15.1*TILE, false, 'KỶ NGUYÊN|VƯƠN MÌNH,|VỮNG BƯỚC|TƯƠNG LAI') });
+                entities.push({ y: 15.1*TILE, draw: () => drawStageEmblem(56.8*TILE, 15.1*TILE, true, 'ĐỔI MỚI|SÁNG TẠO,|CHÌA KHÓA|THÀNH CÔNG') });
             }
 
             state.npcs.forEach((npc, idx) => {
@@ -5481,6 +5509,7 @@
             ctx.fillStyle = vg; ctx.fillRect(0,0,w,h);
             ctx.restore();
         }
+
 
         function gameLoop(now) {
             const dt = Math.min(0.05, (now - lastTime) / 1000);
