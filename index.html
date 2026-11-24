@@ -880,7 +880,9 @@
             <div class="text-amber-300 font-bold text-xl">📸 Locket NVC</div>
             <p class="text-sm text-slate-300">Dùng camera thật của điện thoại hoặc máy tính để chụp khoảnh khắc. Ảnh được xem trước rồi đăng công khai lên bản đồ. Tất cả người chơi trong thế giới NVC đều có thể xem, không cần kết bạn.</p>
             <div id="locketPreviewStage" class="rounded-xl overflow-hidden border-2 border-slate-600 bg-slate-900"><img id="locketPreview" class="hidden" alt="Ảnh camera đã chụp"><img id="locketFrameOverlay" class="hidden" alt="Lớp khung ảnh" aria-hidden="true"><div id="locketEmpty" class="p-8 text-center text-slate-400">Chưa chụp ảnh</div></div>
-            <div class="flex gap-2"><button id="captureGamePhoto" class="pixel-btn pixel-btn-green flex-1 rounded-lg py-3">📷 Mở camera thật</button><button id="retakeGamePhoto" class="hidden pixel-btn rounded-lg px-3">Chụp lại</button></div>
+            <div class="grid grid-cols-2 gap-2"><button id="captureGamePhoto" type="button" class="pixel-btn pixel-btn-green rounded-lg py-3">📷 Chụp ảnh</button><button id="chooseLocketImageBtn" type="button" class="pixel-btn rounded-lg py-3">🖼️ Thêm từ máy</button></div>
+            <input id="locketImageInput" type="file" accept="image/*" class="hidden" aria-label="Chọn ảnh từ thiết bị">
+            <div class="flex justify-end"><button id="retakeGamePhoto" class="hidden pixel-btn rounded-lg px-3">Chụp lại</button></div>
             <textarea id="locketCaption" maxlength="180" rows="2" placeholder="Viết vài dòng về khoảnh khắc này..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white"></textarea>
             <section class="rounded-xl border border-pink-300/40 bg-gradient-to-br from-slate-900 to-pink-950/30 p-3 space-y-2">
               <div class="flex items-center justify-between gap-2"><b class="text-pink-200">🎀 Chọn khung ảnh thanh xuân</b><span class="text-[10px] text-slate-400">8 mẫu thiết kế</span></div>
@@ -6332,6 +6334,23 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
         async function updateLocketFramedPreview(){if(!phoneApp.capturedBlob)return;try{const frame=phoneApp.selectedFrame||'yearbook';const framed=await makeLocketFramedBlob(phoneApp.capturedBlob);if(phoneApp.previewFrameUrl)URL.revokeObjectURL(phoneApp.previewFrameUrl);phoneApp.previewFrameUrl=URL.createObjectURL(framed);phoneEl('locketPreview').src=phoneApp.previewFrameUrl;phoneEl('locketFrameOverlay').classList.add('hidden');}catch(e){console.warn(e);}}
         function chooseLocketFrame(frame){if(!NVC_LOCKET_FRAME_NAMES[frame])return;phoneApp.selectedFrame=frame;document.querySelectorAll('.locket-frame-option').forEach(b=>b.classList.toggle('selected',b.dataset.locketFrame===frame));phoneEl('locketFrameStatus').textContent='Đang chọn: '+NVC_LOCKET_FRAME_NAMES[frame];updateLocketFramedPreview();}
         function captureGamePhoto(){openRealCamera();}
+        // Cho phép chọn ảnh có sẵn trong điện thoại/máy tính để đăng Locket.
+        function chooseLocketImage(){phoneEl('locketImageInput').click();}
+        function handleLocketImageSelection(event){
+            const file=event.target.files&&event.target.files[0];
+            if(!file)return;
+            if(!file.type||!file.type.startsWith('image/')){phoneEl('locketStatus').textContent='Vui lòng chọn một tệp hình ảnh.';event.target.value='';return;}
+            if(file.size>15*1024*1024){phoneEl('locketStatus').textContent='Ảnh quá lớn. Vui lòng chọn ảnh nhỏ hơn 15 MB.';event.target.value='';return;}
+            phoneApp.capturedBlob=file;
+            phoneEl('locketPreview').classList.remove('hidden');
+            phoneEl('locketEmpty').classList.add('hidden');
+            phoneEl('publishGamePhoto').disabled=false;
+            phoneEl('publishGamePhoto').classList.remove('opacity-50');
+            phoneEl('retakeGamePhoto').classList.remove('hidden');
+            updateLocketFramedPreview();
+            phoneEl('locketStatus').textContent='Đã chọn ảnh từ thiết bị! Bạn có thể viết caption, chọn khung rồi đăng.';
+            event.target.value='';
+        }
         // Ảnh được đăng khi đang ở trong phòng sẽ được ghim vào chính phòng đó.
         const locketInteriorImageCache = new Map();
         function getLocketRoomLabel(post){
@@ -6426,6 +6445,8 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
         document.querySelectorAll('[data-locket-preview]').forEach(img=>{img.src=NVC_FRAME_ASSETS[img.dataset.locketPreview]||NVC_FRAME_ASSETS.yearbook;});
         document.querySelectorAll('.locket-frame-option').forEach(b=>b.addEventListener('click',()=>chooseLocketFrame(b.dataset.locketFrame)));
         phoneEl('captureGamePhoto').addEventListener('click',captureGamePhoto);
+        phoneEl('chooseLocketImageBtn').addEventListener('click',chooseLocketImage);
+        phoneEl('locketImageInput').addEventListener('change',handleLocketImageSelection);
         phoneEl('retakeGamePhoto').addEventListener('click',captureGamePhoto);
         phoneEl('nvcCameraClose').addEventListener('click',closeRealCamera);
         phoneEl('nvcCameraSwitch').addEventListener('click',switchRealCamera);
