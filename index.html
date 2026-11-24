@@ -832,7 +832,7 @@
    <p class="text-center font-bold text-amber-200 text-lg">TRƯỜNG THPT NGUYỄN VĂN CỪ - NƠI HỘI TỤ VÀ LAN TỎA CÁC GIÁ TRỊ TRI THỨC, THẨM MĨ VÀ NHÂN VĂN.</p>
   </div>
   <div id="schoolInfoPage2" class="hidden overflow-y-auto p-4 sm:p-6 text-slate-100 leading-relaxed space-y-4" style="overscroll-behavior:contain">
-   <div class="text-center"><div class="text-4xl mb-2">🎮</div><h2 class="pixel-font text-amber-200 text-lg sm:text-xl">NHỮNG NGƯỜI TẠO NÊN GAME</h2><p class="text-slate-300 mt-2">NVC ONLINE • LỜI TRI ÂN</p></div>
+   <div class="text-center"><div class="text-4xl mb-2">🎮</div><h2 class="pixel-font text-amber-200 text-lg sm:text-xl">NHỮNG NGƯỜI TẠO NÊN GAME</h2></div>
    <div class="bg-slate-900 border-2 border-amber-700 rounded-lg p-4 text-center">
     <div class="text-amber-200 font-bold text-xl tracking-wide">DEV:</div>
     <div class="text-slate-100 font-bold text-lg mt-2">Vhy • GPT • GEMINI • CLAUDE</div>
@@ -4805,7 +4805,7 @@
             if (floorNum === 1) {
 
                 // Bảng thông tin lịch sử trường tại sảnh chính (vị trí người dùng khoanh).
-                const boardX = 43.25 * TILE, boardFootY = 38.35 * TILE;
+                const boardX = 43.25 * TILE, boardFootY = 40.35 * TILE;
                 entities.push({ y: boardFootY, draw: () => {
                     if (!schoolBoardImg.complete || !schoolBoardImg.naturalWidth) return;
                     const bw = 3.0 * TILE, bh = 3.05 * TILE;
@@ -5335,7 +5335,7 @@
 
             let foundInteractable = null;
             if (state.currentFloor === 1 && !state.mountedVehicle) {
-                if (Math.hypot(state.player.x - 43.25*TILE, state.player.y - 37.25*TILE) < 105) {
+                if (Math.hypot(state.player.x - 43.25*TILE, state.player.y - 39.25*TILE) < 105) {
                     foundInteractable = { kind: 'school_history_board' };
                 }
                 if (!foundInteractable && ptx >= 78 && ptx <= 83 && pty >= 45 && pty <= 49) {
