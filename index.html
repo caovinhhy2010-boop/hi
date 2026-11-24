@@ -6353,11 +6353,14 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
                 const up=await multiplayer.client.storage.from('nvc-locket').upload(path,framedBlob,{contentType:'image/webp',upsert:false});if(up.error)throw up.error;
                 uploadedPath=path;
                 const {data:{publicUrl}}=multiplayer.client.storage.from('nvc-locket').getPublicUrl(path);
-                // Ghim theo tọa độ hiện tại của nhân vật, không gắn vào một vị trí/căn phòng cố định.
-                const postX=Math.round(state.interiorScene?state.interiorScene.returnX:state.player.x);
-                const postY=Math.round(state.interiorScene?state.interiorScene.returnY:state.player.y);
+                // Khi ở trong phòng, lưu tọa độ nội thất và nhãn phòng; ngoài sân thì lưu tọa độ thế giới.
+                const inside=state.interiorScene;
+                const postX=Math.round(inside?inside.px:state.player.x);
+                const postY=Math.round(inside?inside.py:state.player.y);
                 const rawCaption=phoneEl('locketCaption').value.trim().slice(0,180);
-                const ins=await multiplayer.client.from('nvc_photo_posts').insert({user_id:phoneApp.user.id,author_id:phoneApp.user.id,owner_key:deviceOwnerKey,image_path:path,image_url:publicUrl,caption:rawCaption,x:postX,y:postY,floor:state.currentFloor}).select().single();
+                const roomPrefix=inside?'[[NVCROOM:'+encodeURIComponent(inside.room.label)+']] ':'';
+                const storedCaption=roomPrefix+rawCaption;
+                const ins=await multiplayer.client.from('nvc_photo_posts').insert({user_id:phoneApp.user.id,author_id:phoneApp.user.id,owner_key:deviceOwnerKey,image_path:path,image_url:publicUrl,caption:storedCaption,x:postX,y:postY,floor:state.currentFloor}).select().single();
                 if(ins.error)throw ins.error;
                 uploadedPath=null;
                 addPhotoPost(ins.data);
@@ -6403,9 +6406,29 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
                 const img=b.querySelector('img');if(img&&img.src!==post.image_url)img.src=post.image_url;
                 b.onclick=()=>showPhotoPost(post);
                 b.title=(getLocketDisplayCaption(post)||'Ảnh Locket')+' — nhấn để xem';
-                const visible=state.mode==='PLAYING'&&!state.interiorScene&&!getLocketRoomLabel(post)&&Number(post.floor)===Number(state.currentFloor);
+                const roomLabel=getLocketRoomLabel(post);
+                const sameFloor=Number(post.floor)===Number(state.currentFloor);
+                const visible=state.mode==='PLAYING'&&sameFloor&&(
+                    state.interiorScene ? Boolean(roomLabel)&&roomLabel===state.interiorScene.room.label : !roomLabel
+                );
                 b.style.display=visible?'flex':'none';
-                if(visible){const r=canvas.getBoundingClientRect();const x=(Number(post.x)-state.camera.x+canvas.width/2)*(r.width/canvas.width)+r.left;const y=(Number(post.y)-state.camera.y+canvas.height/2)*(r.height/canvas.height)+r.top;b.style.left=(x-25)+'px';b.style.top=(y-30)+'px';}
+                if(visible){
+                    const r=canvas.getBoundingClientRect();
+                    let screenX,screenY;
+                    if(state.interiorScene){
+                        const bp=state.interiorScene.bp;
+                        const marginX=42,marginY=115;
+                        const scale=Math.min((canvas.width-marginX*2)/(bp.w+70),(canvas.height-marginY*2)/(bp.h+60),1.25);
+                        const offsetX=Math.floor((canvas.width-bp.w*scale)/2);
+                        const offsetY=Math.floor((canvas.height-bp.h*scale)/2+20);
+                        screenX=(offsetX+Number(post.x)*scale)*(r.width/canvas.width)+r.left;
+                        screenY=(offsetY+Number(post.y)*scale)*(r.height/canvas.height)+r.top;
+                    }else{
+                        screenX=(Number(post.x)-state.camera.x+canvas.width/2)*(r.width/canvas.width)+r.left;
+                        screenY=(Number(post.y)-state.camera.y+canvas.height/2)*(r.height/canvas.height)+r.top;
+                    }
+                    b.style.left=(screenX-25)+'px';b.style.top=(screenY-30)+'px';
+                }
             });
         }
         async function showPhotoPost(post){
