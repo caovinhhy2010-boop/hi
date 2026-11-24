@@ -3805,33 +3805,7 @@
                 ctx.fillRect(s.x + 3, s.y + 3, s.w - 6, s.h - 6);
             });
 
-            // Góc trưng bày ảnh Locket của riêng căn phòng/lớp học hiện tại.
-            const roomPhotos=(phoneApp.posts||[]).filter(post=>getLocketRoomLabel(post)===sc.room.label).slice(0,8);
-            if(roomPhotos.length){
-                const frameW=Math.min(58,Math.max(38,(bp.w-40)/roomPhotos.length-7));
-                const frameH=48;
-                const gap=6;
-                const totalW=roomPhotos.length*frameW+(roomPhotos.length-1)*gap;
-                const startX=Math.max(16,(bp.w-totalW)/2);
-                const frameY=48;
-                roomPhotos.forEach((post,index)=>{
-                    const fx=startX+index*(frameW+gap);
-                    ctx.fillStyle='rgba(15,23,42,.28)';ctx.fillRect(fx+3,frameY+3,frameW,frameH);
-                    ctx.fillStyle='#f8fafc';ctx.fillRect(fx,frameY,frameW,frameH);
-                    ctx.strokeStyle='#92400e';ctx.lineWidth=2;ctx.strokeRect(fx,frameY,frameW,frameH);
-                    const photo=getLocketInteriorImage(post.image_url);
-                    if(photo){
-                        const pad=4, iw=frameW-pad*2, ih=frameH-pad*2;
-                        const scale=Math.max(iw/photo.naturalWidth,ih/photo.naturalHeight);
-                        const sw=iw/scale, sh=ih/scale;
-                        ctx.save();ctx.beginPath();ctx.rect(fx+pad,frameY+pad,iw,ih);ctx.clip();
-                        ctx.drawImage(photo,(photo.naturalWidth-sw)/2,(photo.naturalHeight-sh)/2,sw,sh,fx+pad,frameY+pad,iw,ih);ctx.restore();
-                    }else{
-                        ctx.fillStyle='#e2e8f0';ctx.fillRect(fx+4,frameY+4,frameW-8,frameH-8);
-                        ctx.fillStyle='#64748b';ctx.font='18px sans-serif';ctx.textAlign='center';ctx.fillText('📷',fx+frameW/2,frameY+29);
-                    }
-                });
-            }
+            // Ảnh Locket không còn bị gom vào góc trưng bày cố định trong phòng; vị trí được lưu theo nhân vật.
 
             const renderList = [];
             bp.obstacles.forEach(b => {
@@ -6370,19 +6344,36 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
         async function publishGamePhoto(){
             if(!phoneApp.user||!phoneApp.capturedBlob)return;
             const btn=phoneEl('publishGamePhoto');btn.disabled=true;phoneEl('locketStatus').textContent='Đang tải ảnh lên...';
+            let uploadedPath=null;
             try{
-                const path=phoneApp.user.id+'/'+Date.now()+'.webp';
+                // Tên tệp ngẫu nhiên giúp đăng lại nhiều lần, kể cả vừa xóa ảnh cũ.
+                const uniqueName=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2))+'.webp';
+                const path=phoneApp.user.id+'/'+uniqueName;
                 const framedBlob=await makeLocketFramedBlob(phoneApp.capturedBlob);
                 const up=await multiplayer.client.storage.from('nvc-locket').upload(path,framedBlob,{contentType:'image/webp',upsert:false});if(up.error)throw up.error;
+                uploadedPath=path;
                 const {data:{publicUrl}}=multiplayer.client.storage.from('nvc-locket').getPublicUrl(path);
-                const insideRoom=state.interiorScene?.room||null;
+                // Ghim theo tọa độ hiện tại của nhân vật, không gắn vào một vị trí/căn phòng cố định.
+                const postX=Math.round(state.interiorScene?state.interiorScene.returnX:state.player.x);
+                const postY=Math.round(state.interiorScene?state.interiorScene.returnY:state.player.y);
                 const rawCaption=phoneEl('locketCaption').value.trim().slice(0,180);
-                const storedCaption=insideRoom?'[[NVCROOM:'+encodeURIComponent(insideRoom.label)+']] '+rawCaption:rawCaption;
-                const postX=insideRoom?Math.round(state.interiorScene.px):Math.round(state.player.x);
-                const postY=insideRoom?Math.round(state.interiorScene.py):Math.round(state.player.y);
-                const ins=await multiplayer.client.from('nvc_photo_posts').insert({user_id:phoneApp.user.id,author_id:phoneApp.user.id,owner_key:deviceOwnerKey,image_path:path,image_url:publicUrl,caption:storedCaption,x:postX,y:postY,floor:state.currentFloor}).select().single();if(ins.error)throw ins.error;
-                addPhotoPost(ins.data);phoneEl('locketStatus').textContent=insideRoom?'Đã đăng ảnh vào lớp '+insideRoom.label+'! Ảnh sẽ được trưng bày ngay bên trong lớp.':'Đã đăng ảnh! Biểu tượng ảnh đã xuất hiện trên bản đồ.';phoneApp.capturedBlob=null;if(phoneApp.previewFrameUrl){URL.revokeObjectURL(phoneApp.previewFrameUrl);phoneApp.previewFrameUrl=null;}phoneEl('publishGamePhoto').disabled=true;phoneEl('publishGamePhoto').classList.add('opacity-50');loadMyPhotoPosts();
-            }catch(e){console.error(e);phoneEl('locketStatus').textContent='Đăng ảnh thất bại: '+(e.message||'Kiểm tra Storage và SQL.');btn.disabled=false;}
+                const ins=await multiplayer.client.from('nvc_photo_posts').insert({user_id:phoneApp.user.id,author_id:phoneApp.user.id,owner_key:deviceOwnerKey,image_path:path,image_url:publicUrl,caption:rawCaption,x:postX,y:postY,floor:state.currentFloor}).select().single();
+                if(ins.error)throw ins.error;
+                uploadedPath=null;
+                addPhotoPost(ins.data);
+                phoneApp.capturedBlob=null;
+                if(phoneApp.previewFrameUrl){URL.revokeObjectURL(phoneApp.previewFrameUrl);phoneApp.previewFrameUrl=null;}
+                phoneEl('locketPreview').removeAttribute('src');phoneEl('locketPreview').classList.add('hidden');
+                phoneEl('locketEmpty').classList.remove('hidden');phoneEl('locketImageInput').value='';
+                phoneEl('locketCaption').value='';phoneEl('retakeGamePhoto').classList.add('hidden');
+                btn.disabled=true;btn.classList.add('opacity-50');
+                phoneEl('locketStatus').textContent='Đã đăng ảnh tại đúng vị trí bạn đang đứng! Bạn có thể chụp hoặc chọn ảnh khác để đăng tiếp.';
+                await loadMyPhotoPosts();
+            }catch(e){
+                console.error(e);
+                if(uploadedPath)await multiplayer.client.storage.from('nvc-locket').remove([uploadedPath]);
+                phoneEl('locketStatus').textContent='Đăng ảnh thất bại: '+(e.message||'Kiểm tra quyền Storage/SQL trong Supabase.');btn.disabled=false;
+            }
         }
         async function loadPhotoPosts(){if(!multiplayer.client)return;const {data,error}=await multiplayer.client.from('nvc_photo_posts').select('id,user_id,author_id,owner_key,image_path,image_url,caption,x,y,floor,created_at').order('created_at',{ascending:false}).limit(100);if(error){console.warn('Photo posts:',error.message);return;}phoneApp.posts=[];(data||[]).forEach(addPhotoPost);}
         function addPhotoPost(post){
@@ -6406,9 +6397,8 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
                     b.type='button';
                     b.className='nvc-locket-map-frame absolute pointer-events-auto';
                     b.setAttribute('aria-label','Mở ảnh Locket của '+(post.author_name||'học sinh NVC'));
-                    const img=document.createElement('img');img.className='nvc-locket-map-thumb';img.alt='Ảnh Locket được ghim trên bản đồ';img.loading='lazy';img.draggable=false;
-                    const pin=document.createElement('span');pin.className='nvc-locket-map-pin';pin.textContent='📍';
-                    b.append(img,pin);b.onclick=()=>showPhotoPost(post);layer.append(b);phoneApp.markerEls.set(post.id,b);
+                    const img=document.createElement('img');img.className='nvc-locket-map-thumb';img.alt='Ảnh Locket tại vị trí đăng';img.loading='lazy';img.draggable=false;
+                    b.append(img);b.onclick=()=>showPhotoPost(post);layer.append(b);phoneApp.markerEls.set(post.id,b);
                 }
                 const img=b.querySelector('img');if(img&&img.src!==post.image_url)img.src=post.image_url;
                 b.onclick=()=>showPhotoPost(post);
@@ -6428,9 +6418,12 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
         async function deleteMyPhotoPost(){
             const post=phoneApp.activePhotoPost;if(!post||!phoneApp.user||post.user_id!==phoneApp.user.id||post.author_id!==phoneApp.user.id||post.owner_key!==deviceOwnerKey){phoneStatus('Không có quyền gỡ ảnh này.',true);return;}
             if(!confirm('Gỡ ảnh này khỏi Locket và bản đồ?'))return;
-            const del=await multiplayer.client.from('nvc_photo_posts').delete().eq('id',post.id).eq('user_id',phoneApp.user.id).eq('author_id',phoneApp.user.id).eq('owner_key',deviceOwnerKey);
+            const del=await multiplayer.client.from('nvc_photo_posts').delete().eq('id',post.id).eq('user_id',phoneApp.user.id).eq('author_id',phoneApp.user.id).eq('owner_key',deviceOwnerKey).select('id').maybeSingle();
             if(del.error){phoneStatus('Không gỡ được ảnh: '+del.error.message,true);return;}
-            await multiplayer.client.storage.from('nvc-locket').remove([post.image_path]);removePhotoPost(post.id);phoneEl('photoViewModal').classList.add('hidden');loadMyPhotoPosts();
+            if(!del.data){phoneStatus('Ảnh chưa được xóa trên máy chủ (có thể quyền xóa chưa được cấp). Vì vậy bạn vẫn chưa thể đăng ảnh mới. Hãy kiểm tra chính sách DELETE của bảng nvc_photo_posts trong Supabase.',true);return;}
+            const storageDel=await multiplayer.client.storage.from('nvc-locket').remove([post.image_path]);
+            if(storageDel.error)console.warn('Không xóa được file ảnh cũ:',storageDel.error.message);
+            removePhotoPost(post.id);phoneApp.activePhotoPost=null;phoneEl('photoViewModal').classList.add('hidden');await loadMyPhotoPosts();
         }
         phoneEl('deleteMyPhotoBtn').addEventListener('click',deleteMyPhotoPost);
         async function loadMyPhotoPosts(){if(!phoneApp.user)return;const box=phoneEl('myPhotoPosts');box.textContent='Đang tải ảnh công khai...';const {data,error}=await multiplayer.client.from('nvc_photo_posts').select('id,user_id,author_id,owner_key,image_path,image_url,caption,x,y,floor,created_at').order('created_at',{ascending:false}).limit(30);box.replaceChildren();if(error){box.textContent='Không tải được ảnh công khai: '+error.message;return;} (data||[]).forEach(p=>{const im=document.createElement('img');im.src=p.image_url;im.alt='Ảnh Locket công khai';im.title=(getLocketDisplayCaption(p)||'Ảnh Locket')+' — nhấn để xem';im.className='w-full aspect-square object-cover rounded border border-slate-600 cursor-pointer';im.onclick=()=>showPhotoPost(p);box.append(im);});if(!data?.length)box.textContent='Chưa có ảnh công khai nào. Hãy là người đầu tiên chia sẻ khoảnh khắc NVC!';}
