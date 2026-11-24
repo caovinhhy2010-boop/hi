@@ -4915,6 +4915,8 @@
                         } else {
                             renderActivePlayerSprite(ctx, state.player.x, state.player.y, 2.8, state.player.dir, state.player.frame, timeSec);
                         }
+                        const emote=window.nvcActionEmote;
+                        if(emote&&performance.now()<emote.until){const t=(emote.until-performance.now())/1800;const bob=Math.sin(timeSec*13)*3;ctx.save();ctx.globalAlpha=Math.min(1,t*2);ctx.font='24px sans-serif';ctx.textAlign='center';ctx.fillText(emote.emoji,state.player.x,state.player.y-42-bob);ctx.restore();}
                     }
                 });
             }
@@ -6757,6 +6759,24 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
 </section>
 <script id="nvc-world-chat-script">
 (()=>{const btn=document.getElementById('nvcWorldChatBtn'),panel=document.getElementById('nvcWorldChat'),close=document.getElementById('nvcWorldChatClose'),log=document.getElementById('nvcWorldChatLog'),form=document.getElementById('nvcWorldChatForm'),input=document.getElementById('nvcWorldChatInput'),status=document.getElementById('nvcWorldChatStatus');if(!btn)return;let history=[];try{history=JSON.parse(localStorage.getItem('nvc_world_chat_history')||'[]')}catch{};function render(m){const row=document.createElement('div');row.className='wc-msg';const n=document.createElement('span');n.className='wc-name';n.textContent=(m.name||'Người chơi')+':';const c=document.createElement('span');c.textContent=m.text||'';const t=document.createElement('span');t.className='wc-time';t.textContent=m.time||'';row.append(n,c,t);log.append(row);log.scrollTop=log.scrollHeight;}history.slice(-40).forEach(render);function save(m){history.push(m);history=history.slice(-40);try{localStorage.setItem('nvc_world_chat_history',JSON.stringify(history))}catch{}render(m)}btn.onclick=()=>panel.classList.toggle('open');close.onclick=()=>panel.classList.remove('open');form.addEventListener('submit',async e=>{e.preventDefault();const text=input.value.trim();if(!text)return;const mp=(typeof multiplayer!=='undefined'?multiplayer:null);if(!mp||!mp.connected||!mp.channel){status.textContent='Bạn cần kết nối thế giới chung để gửi tin nhắn.';return;}const m={name:(typeof safePlayerName==='function'?safePlayerName():'Người chơi'),text,time:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),id:mp.playerId};try{await mp.channel.send({type:'broadcast',event:'world-chat',payload:m});save(m);input.value='';status.textContent='Đã gửi vào chat thế giới.'}catch{status.textContent='Gửi tin nhắn thất bại, thử lại nhé.'}});window.addEventListener('nvc-world-chat-message',e=>{const m=e.detail;if(m&&m.text&&m.id!==(typeof multiplayer!=='undefined'?multiplayer.playerId:null))save(m)});})();
+</script>
+
+<style id="nvc-action-panel-style">
+#nvcActionToggle{position:fixed;left:12px;bottom:calc(94px + env(safe-area-inset-bottom,0px));z-index:9998;border:1px solid #ffffff45;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font:700 14px system-ui;padding:11px 14px;box-shadow:0 5px 18px #0005;touch-action:manipulation}
+#nvcActionPanel{position:fixed;left:12px;bottom:calc(148px + env(safe-area-inset-bottom,0px));z-index:9998;display:none;width:min(188px,calc(100vw - 24px));grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:9px;border:1px solid #ffffff35;border-radius:16px;background:rgba(15,23,42,.94);backdrop-filter:blur(8px);box-shadow:0 8px 24px #0006}
+#nvcActionPanel.open{display:grid}#nvcActionPanel button{min-height:52px;border-radius:12px;border:1px solid #ffffff25;background:#334155;color:white;font:600 13px system-ui;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}#nvcActionPanel button:active{transform:scale(.95);background:#475569}#nvcActionPanel button span{font-size:21px;line-height:1.1}
+@media(max-width:600px){#nvcActionToggle{left:8px;bottom:calc(90px + env(safe-area-inset-bottom,0px));padding:10px 12px;font-size:13px}#nvcActionPanel{left:8px;bottom:calc(142px + env(safe-area-inset-bottom,0px));width:174px;gap:6px;padding:8px}#nvcActionPanel button{min-height:48px;font-size:12px}}
+@media(orientation:landscape) and (max-height:500px){#nvcActionToggle{bottom:12px;left:12px}#nvcActionPanel{bottom:62px;left:12px}}
+</style>
+<button id="nvcActionToggle" type="button" aria-expanded="false">🎭 Hành động</button>
+<div id="nvcActionPanel" role="group" aria-label="Hành động vui">
+<button type="button" data-emote="jump"><span>🤸</span>Nhảy nhót</button>
+<button type="button" data-emote="dance"><span>💃</span>Nhảy múa</button>
+<button type="button" data-emote="wave"><span>👋</span>Vẫy tay</button>
+<button type="button" data-emote="cheer"><span>🎉</span>Ăn mừng</button>
+</div>
+<script id="nvc-action-panel-script">
+(()=>{const toggle=document.getElementById('nvcActionToggle'),panel=document.getElementById('nvcActionPanel');if(!toggle||!panel)return;toggle.addEventListener('click',()=>{const open=panel.classList.toggle('open');toggle.setAttribute('aria-expanded',String(open));});const emojis={jump:'🤸',dance:'💃',wave:'👋',cheer:'🎉'};const labels={jump:'Nhảy nhót!',dance:'Đang nhảy múa!',wave:'Xin chào!',cheer:'Ăn mừng!'};let clear;panel.querySelectorAll('[data-emote]').forEach(b=>b.addEventListener('click',()=>{const act=b.dataset.emote;window.nvcActionEmote={emoji:emojis[act],label:labels[act],until:performance.now()+1800,type:act};panel.classList.remove('open');toggle.setAttribute('aria-expanded','false');}));})();
 </script>
 
 </body>
