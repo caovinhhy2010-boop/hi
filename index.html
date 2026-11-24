@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>THPT Nguyễn Văn Cừ - Pixel Adventure 2D</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -428,6 +428,35 @@
 
 <style id="nvc-world-chat-style">
 #nvcWorldChatBtn{position:fixed;right:18px;bottom:92px;z-index:9000;background:#174a75;color:#fff;border:2px solid #8bd5ff;border-radius:10px;padding:9px 13px;font-weight:800;box-shadow:0 4px 0 #092e4a;cursor:pointer}#nvcWorldChat{position:fixed;right:18px;bottom:148px;width:min(340px,calc(100vw - 28px));height:390px;max-height:60vh;z-index:9001;display:none;background:#102338;border:3px solid #65c8ed;border-radius:12px;color:white;box-shadow:0 8px 30px #0008;overflow:hidden;font-family:inherit}#nvcWorldChat.open{display:flex;flex-direction:column}#nvcWorldChat header{padding:9px 11px;background:#174a75;font-weight:bold;display:flex;justify-content:space-between;align-items:center}#nvcWorldChatLog{overflow:auto;flex:1;padding:10px;display:flex;flex-direction:column;gap:7px;font-size:13px}#nvcWorldChatLog .wc-msg{background:#203a53;border-radius:8px;padding:6px 8px;overflow-wrap:anywhere}#nvcWorldChatLog .wc-name{font-weight:bold;color:#a8e8ff;margin-right:5px}#nvcWorldChatLog .wc-time{font-size:10px;color:#9db5c8;margin-left:6px}#nvcWorldChat form{display:flex;gap:6px;padding:8px;border-top:1px solid #38627d}#nvcWorldChatInput{min-width:0;flex:1;color:#fff;background:#071a2a;border:1px solid #51738c;border-radius:6px;padding:7px}#nvcWorldChat form button{background:#1d78b5;color:white;border-radius:6px;padding:6px 10px;font-weight:bold}#nvcWorldChatStatus{font-size:10px;color:#9fc9dd;padding:0 10px 5px}@media(max-width:600px){#nvcWorldChatBtn{right:10px;bottom:80px;padding:8px 10px}#nvcWorldChat{right:8px;bottom:132px;width:calc(100vw - 16px);height:45vh}}
+</style>
+
+
+<style id="nvc-mobile-polish-v2">
+/* Mobile ergonomics: safe areas, readable controls, adaptive chat and keyboard */
+:root { --nvc-safe-right: env(safe-area-inset-right, 0px); --nvc-safe-left: env(safe-area-inset-left, 0px); }
+@media (max-width:700px) {
+  html,body { width:100%; height:100%; height:100dvh; overflow:hidden; }
+  #nvcWorldChatBtn { right:calc(10px + var(--nvc-safe-right)); bottom:calc(148px + var(--nvc-safe-bottom)); min-height:44px; max-width:calc(100vw - 24px); font-size:14px; padding:9px 11px; }
+  #nvcWorldChat { right:calc(8px + var(--nvc-safe-right)); left:calc(8px + var(--nvc-safe-left)); width:auto; bottom:calc(204px + var(--nvc-safe-bottom)); height:min(58dvh,460px); max-height:calc(100dvh - 230px - var(--nvc-safe-top) - var(--nvc-safe-bottom)); border-width:2px; }
+  #nvcWorldChat header { min-height:44px; padding:8px 10px; }
+  #nvcWorldChatClose { min-width:40px; min-height:40px; font-size:20px; touch-action:manipulation; }
+  #nvcWorldChatLog { font-size:15px; padding:9px; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
+  #nvcWorldChat form { padding:8px; padding-bottom:calc(8px + var(--nvc-safe-bottom)); gap:7px; }
+  #nvcWorldChatInput { min-height:44px; font-size:16px; user-select:text; -webkit-user-select:text; }
+  #nvcWorldChat form button { min-width:54px; min-height:44px; }
+  #nvcWorldChatStatus { font-size:12px; padding-bottom:6px; }
+  /* Keep touch controls from triggering browser gestures while moving */
+  #joystickBase, #joystickKnob, #mobileControls { touch-action:none; }
+  #nvcWorldChat, #nvcWorldChatLog { touch-action:pan-y; }
+}
+@media (max-width:700px) and (orientation:landscape) {
+  #nvcWorldChatBtn { bottom:calc(82px + var(--nvc-safe-bottom)); }
+  #nvcWorldChat { bottom:calc(132px + var(--nvc-safe-bottom)); height:min(68dvh,300px); max-height:calc(100dvh - 150px); }
+}
+@media (max-width:380px) {
+  #nvcWorldChatBtn { font-size:12px; padding:8px; }
+  #nvcWorldChat { left:5px; right:5px; }
+}
 </style>
 
 </head>
