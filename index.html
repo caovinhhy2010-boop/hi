@@ -2088,8 +2088,8 @@
             1: {
                 grid: [], rooms: [], stairs: [], halls: [], diningSeats: [],
                 name: 'TẦNG 1',
-                shortDesc: 'Dãy A1-A11, C12-C17, Sân Bóng Chuyền & Sân Cờ',
-                desc: 'Tầng trệt • Khuôn viên toàn trường, Sân Bóng Chuyền & Sảnh Chính'
+                shortDesc: 'Dãy A1-A11, B2-B4, C12-C17, Sân Bóng Chuyền & Sân Cờ',
+                desc: 'Tầng trệt • Dãy B2-B4, khuôn viên toàn trường, Sân Bóng Chuyền & Sảnh Chính'
             },
             2: {
                 grid: [], rooms: [], stairs: [], halls: [], diningSeats: [],
@@ -2191,6 +2191,12 @@
                     });
                     fillRect(31, 5, 35, 10, T.CAMPUS_GROUND);
                     halls.push({ x1: 31, y1: 7, x2: 34, y2: 8, label: 'LỐI VÀO', isZoneLabel: true });
+
+                    // Dãy lớp B2-B4: bố trí đúng khu vực người dùng đánh dấu
+                    // phía trên lối vào, sát khu căn tin. Cửa lớp quay xuống lối đi.
+                    buildRoom(20, 3, 24, 6, 'B2', 'bottom', 'classroom', 'Dãy B (Tầng 1)');
+                    buildRoom(25, 3, 29, 6, 'B3', 'bottom', 'classroom', 'Dãy B (Tầng 1)');
+                    buildRoom(30, 3, 34, 6, 'B4', 'bottom', 'classroom', 'Dãy B (Tầng 1)');
 
                     // 2. MIDDLE-LEFT: NHÀ THI ĐẤU
                     buildRoom(4, 13, 15, 36, 'NHÀ THI ĐẤU', 'right', 'sports_hall', 'Khu Thể Thao');
