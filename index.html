@@ -2210,8 +2210,8 @@
                     fillRect(31, 11, 35, 13, T.CAMPUS_GROUND);
 
                     fillRect(35, 3, 35, 45, T.CAMPUS_GROUND);
-                    // Dựng bức tường mới tại vị trí người dùng đánh dấu màu xanh lá.
-                    fillRect(35, 13, 40, 13, T.WALL);
+                    // Dựng bức tường tại khe giữa dãy B4 và khu WC (vị trí khoanh xanh).
+                    fillRect(35, 5, 35, 6, T.WALL);
 
                     // 4. BOTTOM-LEFT: Sân Bóng Đá Cỏ Nhân Tạo
                     fillRect(2, 38, 16, 50, T.TURF_GRASS);
@@ -2312,6 +2312,12 @@
 
                     // Khuôn viên tượng Nguyễn Văn Cừ giữ nguyên khoảng sân trống và ghế đá.
                     // Sân cầu lông và Pickleball được bố trí bên trong nhà thi đấu.
+
+                    // Chỉnh sửa theo ảnh mới: xóa đoạn tường cyan trong vùng khoanh đỏ,
+                    // giữ nền sân thông thoáng tại khu vực này.
+                    fillRect(41, 27, 48, 28, T.CAMPUS_GROUND);
+                    // Tường mới tại khe B4 - WC, đúng vùng khoanh xanh.
+                    fillRect(35, 5, 35, 6, T.WALL);
                 }
 
                 // =========================================================================
