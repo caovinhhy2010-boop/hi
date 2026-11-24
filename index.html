@@ -4913,10 +4913,19 @@
                             const riderOffsetY = (vType === 'nimbus') ? -14 + Math.sin(timeSec * 5) * 4 : -10;
                             renderActivePlayerSprite(ctx, state.player.x, state.player.y + riderOffsetY, 2.5, state.player.dir, 0, timeSec);
                         } else {
-                            renderActivePlayerSprite(ctx, state.player.x, state.player.y, 2.8, state.player.dir, state.player.frame, timeSec);
+                            const emote=window.nvcActionEmote;
+                            const active=emote&&performance.now()<emote.until;
+                            const phase=active?(performance.now()-emote.start)/1000:0;
+                            let ex=0,ey=0,scale=2.8,eframe=state.player.frame,edir=state.player.dir;
+                            if(active){
+                                if(emote.type==='jump'){ey=-Math.abs(Math.sin(phase*Math.PI*2))*24; eframe=Math.floor(phase*10)%4;}
+                                else if(emote.type==='dance'){ex=Math.sin(phase*10)*5;ey=-Math.abs(Math.sin(phase*7))*5;eframe=Math.floor(phase*8)%4;edir=['left','down','right','up'][Math.floor(phase*3)%4];}
+                                else if(emote.type==='wave'){ey=-Math.abs(Math.sin(phase*5))*3;eframe=Math.floor(phase*6)%4;edir=['down','right','down','left'][Math.floor(phase*3)%4];}
+                                else if(emote.type==='cheer'){ey=-Math.abs(Math.sin(phase*8))*18;ex=Math.sin(phase*5)*2;scale=2.8+Math.sin(phase*8)*.12;eframe=Math.floor(phase*8)%4;}
+                            }
+                            renderActivePlayerSprite(ctx, state.player.x+ex, state.player.y+ey, scale, edir, eframe, timeSec);
+                            if(active){const t=(emote.until-performance.now())/1800;ctx.save();ctx.globalAlpha=Math.min(1,t*2);ctx.font='24px sans-serif';ctx.textAlign='center';ctx.fillText(emote.emoji,state.player.x+ex,state.player.y+ey-42-Math.sin(phase*13)*3);ctx.restore();}
                         }
-                        const emote=window.nvcActionEmote;
-                        if(emote&&performance.now()<emote.until){const t=(emote.until-performance.now())/1800;const bob=Math.sin(timeSec*13)*3;ctx.save();ctx.globalAlpha=Math.min(1,t*2);ctx.font='24px sans-serif';ctx.textAlign='center';ctx.fillText(emote.emoji,state.player.x,state.player.y-42-bob);ctx.restore();}
                     }
                 });
             }
@@ -6776,7 +6785,7 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
 <button type="button" data-emote="cheer"><span>🎉</span>Ăn mừng</button>
 </div>
 <script id="nvc-action-panel-script">
-(()=>{const toggle=document.getElementById('nvcActionToggle'),panel=document.getElementById('nvcActionPanel');if(!toggle||!panel)return;toggle.addEventListener('click',()=>{const open=panel.classList.toggle('open');toggle.setAttribute('aria-expanded',String(open));});const emojis={jump:'🤸',dance:'💃',wave:'👋',cheer:'🎉'};const labels={jump:'Nhảy nhót!',dance:'Đang nhảy múa!',wave:'Xin chào!',cheer:'Ăn mừng!'};let clear;panel.querySelectorAll('[data-emote]').forEach(b=>b.addEventListener('click',()=>{const act=b.dataset.emote;window.nvcActionEmote={emoji:emojis[act],label:labels[act],until:performance.now()+1800,type:act};panel.classList.remove('open');toggle.setAttribute('aria-expanded','false');}));})();
+(()=>{const toggle=document.getElementById('nvcActionToggle'),panel=document.getElementById('nvcActionPanel');if(!toggle||!panel)return;toggle.addEventListener('click',()=>{const open=panel.classList.toggle('open');toggle.setAttribute('aria-expanded',String(open));});const emojis={jump:'🤸',dance:'💃',wave:'👋',cheer:'🎉'};const labels={jump:'Nhảy nhót!',dance:'Đang nhảy múa!',wave:'Xin chào!',cheer:'Ăn mừng!'};let clear;panel.querySelectorAll('[data-emote]').forEach(b=>b.addEventListener('click',()=>{const act=b.dataset.emote;window.nvcActionEmote={emoji:emojis[act],label:labels[act],start:performance.now(),until:performance.now()+1800,type:act};panel.classList.remove('open');toggle.setAttribute('aria-expanded','false');}));})();
 </script>
 
 </body>
