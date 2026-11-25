@@ -2338,7 +2338,7 @@
                     grid[1][68] = T.WALL;
 
                     // Thảm cỏ khu đại thụ mới (vùng bên phải nhà kính, gần tường biên).
-                    fillRect(76, 2, 84, 9, T.TURF_GRASS);
+                    fillRect(82, 8, 90, 15, T.TURF_GRASS);
 
                     // NHÀ KÍNH "VƯỜN RAU BÁC HỒ" trong nhà xe (x=69..74, y=9..17), cửa ra vào ở phía đông (74,13).
                     for (let gy = 9; gy <= 17; gy++) {
@@ -4820,7 +4820,7 @@
                 entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 76.15 * TILE, bedY, bedW, bedH, 1) });
                 entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 84.05 * TILE, bedY, bedW, bedH, 3) });
                 // Cây đại thụ giữa thảm cỏ mới, tán lớn và thân đặt giữa khu đất.
-                const giantTreeX = 80.5 * TILE, giantTreeY = 6.0 * TILE;
+                const giantTreeX = 86.5 * TILE, giantTreeY = 12.0 * TILE;
                 entities.push({ y: giantTreeY + 1.5 * TILE, draw: () => drawPixelTree(giantTreeX, giantTreeY, 2.05, txSeed(805, 600)) });
                 ALL_AUTUMN_TREES.forEach((tr, i) => {
                     const sx = tr.x * TILE, sy = tr.y * TILE;
