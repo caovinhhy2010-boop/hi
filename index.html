@@ -427,16 +427,10 @@
     </style>
 
 <style id="nvc-world-chat-style">
-#nvcWorldChatBtn{position:fixed;right:18px;bottom:92px;z-index:2147483000;width:52px;height:52px;display:none;align-items:center;justify-content:center;background:#174a75;color:#fff;border:2px solid #8bd5ff;border-radius:16px;padding:0;font-size:25px;font-weight:800;box-shadow:0 4px 0 #092e4a;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}#nvcWorldChatBtn:active{cursor:grabbing;transform:scale(.96)}#nvcWorldChat{position:fixed;right:18px;bottom:148px;width:min(340px,calc(100vw - 28px));height:390px;max-height:60vh;z-index:2147483001;display:none;background:#102338;border:3px solid #65c8ed;border-radius:12px;color:white;box-shadow:0 8px 30px #0008;overflow:hidden;font-family:inherit}#nvcWorldChat.open{display:flex!important;flex-direction:column;visibility:visible!important;opacity:1!important;pointer-events:auto!important}#nvcWorldChat header{padding:9px 11px;background:#174a75;font-weight:bold;display:flex;justify-content:space-between;align-items:center}#nvcWorldChatLog{overflow:auto;flex:1;padding:10px;display:flex;flex-direction:column;gap:7px;font-size:13px}#nvcWorldChatLog .wc-msg{background:#203a53;border-radius:8px;padding:6px 8px;overflow-wrap:anywhere}#nvcWorldChatLog .wc-name{font-weight:bold;color:#a8e8ff;margin-right:5px}#nvcWorldChatLog .wc-time{font-size:10px;color:#9db5c8;margin-left:6px}#nvcWorldChat form{display:flex;gap:6px;padding:8px;border-top:1px solid #38627d}#nvcWorldChatInput{min-width:0;flex:1;color:#fff;background:#071a2a;border:1px solid #51738c;border-radius:6px;padding:7px}#nvcWorldChat form button{background:#1d78b5;color:white;border-radius:6px;padding:6px 10px;font-weight:bold}#nvcWorldChatStatus{font-size:10px;color:#9fc9dd;padding:0 10px 5px}@media(max-width:600px){#nvcWorldChatBtn{right:10px;bottom:80px;padding:8px 10px}#nvcWorldChat{right:8px;bottom:132px;width:calc(100vw - 16px);height:45vh}}
+#nvcWorldChatBtn{position:fixed;right:18px;bottom:92px;z-index:9999;width:52px;height:52px;display:none;align-items:center;justify-content:center;background:#174a75;color:#fff;border:2px solid #8bd5ff;border-radius:16px;padding:0;font-size:25px;font-weight:800;box-shadow:0 4px 0 #092e4a;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}#nvcWorldChatBtn:active{cursor:grabbing;transform:scale(.96)}#nvcWorldChat{position:fixed;right:18px;bottom:148px;width:min(340px,calc(100vw - 28px));height:390px;max-height:60vh;z-index:9001;display:none;background:#102338;border:3px solid #65c8ed;border-radius:12px;color:white;box-shadow:0 8px 30px #0008;overflow:hidden;font-family:inherit}#nvcWorldChat.open{display:flex;flex-direction:column}#nvcWorldChat header{padding:9px 11px;background:#174a75;font-weight:bold;display:flex;justify-content:space-between;align-items:center}#nvcWorldChatLog{overflow:auto;flex:1;padding:10px;display:flex;flex-direction:column;gap:7px;font-size:13px}#nvcWorldChatLog .wc-msg{background:#203a53;border-radius:8px;padding:6px 8px;overflow-wrap:anywhere}#nvcWorldChatLog .wc-name{font-weight:bold;color:#a8e8ff;margin-right:5px}#nvcWorldChatLog .wc-time{font-size:10px;color:#9db5c8;margin-left:6px}#nvcWorldChat form{display:flex;gap:6px;padding:8px;border-top:1px solid #38627d}#nvcWorldChatInput{min-width:0;flex:1;color:#fff;background:#071a2a;border:1px solid #51738c;border-radius:6px;padding:7px}#nvcWorldChat form button{background:#1d78b5;color:white;border-radius:6px;padding:6px 10px;font-weight:bold}#nvcWorldChatStatus{font-size:10px;color:#9fc9dd;padding:0 10px 5px}@media(max-width:600px){#nvcWorldChatBtn{right:10px;bottom:80px;padding:8px 10px}#nvcWorldChat{right:8px;bottom:132px;width:calc(100vw - 16px);height:45vh}}
 #nvcWorldChatBtn:active{transform:scale(.96)}
 #nvcWorldChatBtn.nvc-in-game{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
 #nvcActionToggle.nvc-in-game{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
-</style>
-<style id="nvc-school-info-mobile-scroll-fix">
-#schoolHistoryModal>div{display:flex;flex-direction:column;min-height:0;max-height:92vh;max-height:92dvh}
-#schoolHistoryModal>div>div:first-child{flex-shrink:0}
-#schoolInfoPage1,#schoolInfoPage2{flex:1 1 auto;min-height:0;max-height:100%;overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;}
-@media(max-width:700px){#schoolHistoryModal{padding:8px!important;align-items:stretch!important}#schoolHistoryModal>div{width:100%;max-height:calc(100dvh - 16px);height:auto}#schoolInfoPage1,#schoolInfoPage2{padding:14px!important;touch-action:pan-y;overflow-y:scroll!important}}
 </style>
 
 <style id="nvc-mobile-polish-v2">
@@ -2330,9 +2324,9 @@
                     fillRect(19, 47, 33, 53, T.GARAGE_FLOOR);
                     halls.push({ x1: 19, y1: 47, x2: 33, y2: 53, label: 'NHÀ XE GV', isZoneLabel: true });
 
-                    // 7. TOP-RIGHT: NHÀ XE HỌC SINH (mở rộng tới sát tường bên phải)
-                    fillRect(68, 2, 91, 41, T.GARAGE_FLOOR);
-                    halls.push({ x1: 68, y1: 2, x2: 91, y2: 41, label: 'NHÀ XE', isZoneLabel: true });
+                    // 7. TOP-RIGHT: NHÀ XE HỌC SINH (X = 68 → 85)
+                    fillRect(68, 2, 85, 41, T.GARAGE_FLOOR);
+                    halls.push({ x1: 68, y1: 2, x2: 85, y2: 41, label: 'NHÀ XE', isZoneLabel: true });
 
                     // Chỉ dựng tường dọc ngăn cách nhà xe với khu cầu thang Đông Bắc.
                     // Không dựng tường phía sau dãy lớp A1-A6.
@@ -2342,6 +2336,9 @@
                     // và ô phía trên (x=68, y=1) đều là tường xanh.
                     fillRect(68, 38, 68, 41, T.WALL);
                     grid[1][68] = T.WALL;
+
+                    // Thảm cỏ khu đại thụ mới (vùng bên phải nhà kính, gần tường biên).
+                    fillRect(76, 2, 84, 9, T.TURF_GRASS);
 
                     // NHÀ KÍNH "VƯỜN RAU BÁC HỒ" trong nhà xe (x=69..74, y=9..17), cửa ra vào ở phía đông (74,13).
                     for (let gy = 9; gy <= 17; gy++) {
@@ -2875,15 +2872,15 @@
             hasParkingCard: false,
             vehicles: [
                 { id: 'v1', type: 'bike', x: 71.5 * TILE, y: 6.5 * TILE, dir: 'left' },
-                { id: 'v2', type: 'bike', x: 77.2 * TILE, y: 8.5 * TILE, dir: 'left' },
+                { id: 'v2', type: 'bike', x: 71.5 * TILE, y: 10.5 * TILE, dir: 'left' },
                 { id: 'v3', type: 'scooter', x: 77.2 * TILE, y: 16.5 * TILE, dir: 'left' },
                 { id: 'v4', type: 'scooter', x: 71.5 * TILE, y: 18.5 * TILE, dir: 'left' },
                 { id: 'v5', type: 'bike', x: 71.5 * TILE, y: 22.5 * TILE, dir: 'left' },
                 { id: 'v6', type: 'kart', x: 71.5 * TILE, y: 27.5 * TILE, dir: 'left' },
                 { id: 'v7', type: 'nimbus', x: 71.5 * TILE, y: 32.5 * TILE, dir: 'left' },
 
-                { id: 'v8', type: 'scooter', x: 79.5 * TILE, y: 6.5 * TILE, dir: 'left' },
-                { id: 'v9', type: 'bike', x: 79.5 * TILE, y: 10.5 * TILE, dir: 'left' },
+                { id: 'v8', type: 'scooter', x: 71.5 * TILE, y: 13.5 * TILE, dir: 'left' },
+                { id: 'v9', type: 'bike', x: 71.5 * TILE, y: 15.5 * TILE, dir: 'left' },
                 { id: 'v10', type: 'bike', x: 79.5 * TILE, y: 14.5 * TILE, dir: 'left' },
                 { id: 'v11', type: 'scooter', x: 79.5 * TILE, y: 18.5 * TILE, dir: 'left' },
                 { id: 'v12', type: 'wheelbarrow', x: 79.5 * TILE, y: 23.5 * TILE, dir: 'left' },
@@ -3190,7 +3187,7 @@
                     return { zone: 'Sân Trường Trung Tâm', wing: 'Khu Sân Cờ (Tầng 1)' };
                 }
                 if (ptx >= 69 && ptx <= 74 && pty >= 9 && pty <= 17) return { zone: 'Vườn Rau Bác Hồ', wing: 'Nhà Kính • Khu Nhà Xe Học Sinh' };
-                if (ptx >= 68 && ptx <= 91 && pty >= 2 && pty <= 41) return { zone: 'Nhà Xe Học Sinh', wing: 'Khu Ngoại Vi Đông' };
+                if (ptx >= 68 && ptx <= 85 && pty >= 2 && pty <= 41) return { zone: 'Nhà Xe Học Sinh', wing: 'Khu Ngoại Vi Đông' };
                 if (ptx >= 78 && ptx <= 83 && pty >= 45 && pty <= 49) return { zone: 'Trạm Lấy Thẻ Xe', wing: 'Khu Nhà Xe & Cổng Phụ Đông Nam' };
                 if (ptx >= 77 && ptx <= 83 && pty >= 54 && pty <= 57) return { zone: 'Cổng Phụ Đông Nam', wing: 'Lối Ra Cổng Phụ' };
                 if (ptx >= 86 && ptx <= 91 && pty >= 42 && pty <= 53) return { zone: 'Khu Phòng Câu Lạc Bộ & Đoàn', wing: 'Khu Mở Rộng Đông Nam' };
@@ -4822,6 +4819,9 @@
                 const bedW = 1.15 * TILE;
                 entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 76.15 * TILE, bedY, bedW, bedH, 1) });
                 entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 84.05 * TILE, bedY, bedW, bedH, 3) });
+                // Cây đại thụ giữa thảm cỏ mới, tán lớn và thân đặt giữa khu đất.
+                const giantTreeX = 80.5 * TILE, giantTreeY = 6.0 * TILE;
+                entities.push({ y: giantTreeY + 1.5 * TILE, draw: () => drawPixelTree(giantTreeX, giantTreeY, 2.05, txSeed(805, 600)) });
                 ALL_AUTUMN_TREES.forEach((tr, i) => {
                     const sx = tr.x * TILE, sy = tr.y * TILE;
                     if (sx < effCamX - 5 * TILE || sx > effCamX + canvas.width + 5 * TILE || sy < effCamY - 2 * TILE || sy > effCamY + canvas.height + 6 * TILE) return;
@@ -6786,16 +6786,13 @@ const NVC_LOCKET_FRAME_NAMES={"yearbook": "THƯỚC PHIM KÝ ỨC", "blueSky": "
  if(!btn||!panel||!form||!input||!log)return;
  const menu=document.getElementById('menuOverlay');
  function inGame(){const hud=document.getElementById('gameHud');return !!((menu&&menu.classList.contains('hidden'))||(hud&&!hud.classList.contains('hidden')))}
- let history=[];let wasInGame=inGame();
- function syncVisibility(){const yes=inGame();if(yes&&!wasInGame)resetChat();wasInGame=yes;btn.classList.toggle('nvc-in-game',yes);btn.style.setProperty('display',yes?'flex':'none','important');btn.style.setProperty('visibility',yes?'visible':'hidden','important');btn.style.setProperty('opacity',yes?'1':'0','important');btn.style.setProperty('pointer-events',yes?'auto':'none','important');if(!yes){panel.classList.remove('open');panel.style.setProperty('display','none','important')}}
+ function syncVisibility(){const yes=inGame();btn.classList.toggle('nvc-in-game',yes);btn.style.setProperty('display',yes?'flex':'none','important');if(!yes)panel.classList.remove('open')}
  if(menu)new MutationObserver(syncVisibility).observe(menu,{attributes:true,attributeFilter:['class']});const hud=document.getElementById('gameHud');if(hud)new MutationObserver(syncVisibility).observe(hud,{attributes:true,attributeFilter:['class']});syncVisibility();setInterval(syncVisibility,500);
- const drag=(el,key)=>{let start=null,moved=false;try{const pos=JSON.parse(localStorage.getItem(key)||'null');if(pos&&Number.isFinite(pos.x)&&Number.isFinite(pos.y)&&pos.x<innerWidth-20&&pos.y<innerHeight-20&&pos.x>=0&&pos.y>=0){el.style.left=pos.x+'px';el.style.top=pos.y+'px';el.style.right='auto';el.style.bottom='auto'}}catch{}el.addEventListener('pointerdown',e=>{if(e.button!==undefined&&e.button!==0)return;start={x:e.clientX,y:e.clientY,ox:el.getBoundingClientRect().left,oy:el.getBoundingClientRect().top};moved=false});el.addEventListener('pointermove',e=>{if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.abs(dx)+Math.abs(dy)>9)moved=true;if(moved){const r=el.getBoundingClientRect(),x=Math.max(4,Math.min(innerWidth-r.width-4,start.ox+dx)),y=Math.max(4,Math.min(innerHeight-r.height-4,start.oy+dy));el.style.left=x+'px';el.style.top=y+'px';el.style.right='auto';el.style.bottom='auto'}});el.addEventListener('pointerup',()=>{if(start&&moved){const r=el.getBoundingClientRect();try{localStorage.setItem(key,JSON.stringify({x:r.left,y:r.top}))}catch{}el.dataset.dragged='1'}start=null});el.addEventListener('pointercancel',()=>start=null)};
- drag(btn,'nvc_world_chat_icon_position');
+ const drag=(el,key)=>{let start=null,moved=false;try{const pos=JSON.parse(localStorage.getItem(key)||'null');if(pos&&Number.isFinite(pos.x)&&Number.isFinite(pos.y)){el.style.left=pos.x+'px';el.style.top=pos.y+'px';el.style.right='auto';el.style.bottom='auto'}}catch{}el.addEventListener('pointerdown',e=>{if(e.button!==undefined&&e.button!==0)return;start={x:e.clientX,y:e.clientY,ox:el.getBoundingClientRect().left,oy:el.getBoundingClientRect().top};moved=false;el.setPointerCapture?.(e.pointerId);e.preventDefault()});el.addEventListener('pointermove',e=>{if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.abs(dx)+Math.abs(dy)>7)moved=true;if(moved){const r=el.getBoundingClientRect(),x=Math.max(4,Math.min(innerWidth-r.width-4,start.ox+dx)),y=Math.max(4,Math.min(innerHeight-r.height-4,start.oy+dy));el.style.left=x+'px';el.style.top=y+'px';el.style.right='auto';el.style.bottom='auto'}});el.addEventListener('pointerup',()=>{if(start&&moved){const r=el.getBoundingClientRect();try{localStorage.setItem(key,JSON.stringify({x:r.left,y:r.top}))}catch{}el.dataset.dragged='1'}start=null});el.addEventListener('pointercancel',()=>start=null)};
+ drag(btn,'nvc_world_chat_icon_position');let history=[];try{history=JSON.parse(localStorage.getItem('nvc_world_chat_history')||'[]')}catch{}
  function render(m){const row=document.createElement('div');row.className='wc-msg';const n=document.createElement('span');n.className='wc-name';n.textContent=(m.name||'Người chơi')+':';const c=document.createElement('span');c.textContent=m.text||'';const t=document.createElement('span');t.className='wc-time';t.textContent=m.time||'';row.append(n,c,t);log.append(row);log.scrollTop=log.scrollHeight}
- function save(m){history.push(m);history=history.slice(-40);try{localStorage.setItem('nvc_world_chat_history',JSON.stringify(history))}catch{}render(m)}
- function resetChat(){history=[];log.replaceChildren();try{localStorage.removeItem('nvc_world_chat_history')}catch{}render({name:'Hệ thống',text:'Chào mừng đến với Nguyễn Văn Cừ!',time:''});}
- resetChat();
- btn.addEventListener('click',()=>{if(btn.dataset.dragged==='1'){btn.dataset.dragged='0';return}const opened=panel.classList.toggle('open');panel.style.setProperty('display',opened?'flex':'none','important');if(opened){const r=btn.getBoundingClientRect(),w=Math.min(340,innerWidth-16),h=Math.min(390,innerHeight*.58),x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width-w)),y=Math.max(8,Math.min(innerHeight-h-8,r.top-h-8));panel.style.left=x+'px';panel.style.right='auto';panel.style.top=y+'px';panel.style.bottom='auto';setTimeout(()=>input.focus(),80)}});
+ function save(m){history.push(m);history=history.slice(-40);try{localStorage.setItem('nvc_world_chat_history',JSON.stringify(history))}catch{}render(m)}history.slice(-40).forEach(render);
+ btn.addEventListener('click',()=>{if(btn.dataset.dragged==='1'){btn.dataset.dragged='0';return}const opened=panel.classList.toggle('open');if(opened){const r=btn.getBoundingClientRect(),w=Math.min(340,innerWidth-16),h=Math.min(390,innerHeight*.58),x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width-w)),y=Math.max(8,Math.min(innerHeight-h-8,r.top-h-8));panel.style.left=x+'px';panel.style.right='auto';panel.style.top=y+'px';panel.style.bottom='auto';setTimeout(()=>input.focus(),80)}});
  if(close)close.onclick=()=>panel.classList.remove('open');
  form.addEventListener('submit',async e=>{e.preventDefault();const text=input.value.trim();if(!text)return;const mp=window.multiplayer;if(!mp||!mp.connected||!mp.channel){status.textContent='Chưa kết nối thế giới chung. Hãy vào game online rồi thử lại.';return;}const m={name:(typeof safePlayerName==='function'?safePlayerName():'Người chơi'),text,time:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),id:mp.playerId};const sendBtn=form.querySelector('button[type="submit"]');if(sendBtn)sendBtn.disabled=true;status.textContent='Đang gửi...';try{const result=await mp.channel.send({type:'broadcast',event:'world-chat',payload:m});if(result!=='ok'){status.textContent='Gửi chưa thành công ('+result+'). Kiểm tra kết nối và thử lại.';return;}save(m);input.value='';status.textContent='Đã gửi tin nhắn!';}catch(err){status.textContent='Lỗi gửi tin nhắn. Hãy thử lại khi kết nối ổn định.';}finally{if(sendBtn)sendBtn.disabled=false;input.focus();}});
  window.addEventListener('nvc-world-chat-message',e=>{const m=e.detail;if(m&&m.text&&m.id!==window.multiplayer?.playerId)save(m)});
