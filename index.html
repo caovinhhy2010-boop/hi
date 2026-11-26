@@ -2337,8 +2337,9 @@
                     fillRect(68, 38, 68, 41, T.WALL);
                     grid[1][68] = T.WALL;
 
-                    // Thảm cỏ khu đại thụ mới (vùng bên phải nhà kính, gần tường biên).
-                    fillRect(82, 8, 90, 15, T.TURF_GRASS);
+                    // Đã xóa riêng khoảng sân bên phải được người dùng khoanh xanh.
+                    // Khu vực này chuyển thành nền ngoài bản đồ, không còn là sân chơi.
+                    fillRect(82, 8, 90, 15, T.OUTSIDE);
 
                     // NHÀ KÍNH "VƯỜN RAU BÁC HỒ" trong nhà xe (x=69..74, y=9..17), cửa ra vào ở phía đông (74,13).
                     for (let gy = 9; gy <= 17; gy++) {
