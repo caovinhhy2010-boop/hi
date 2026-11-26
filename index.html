@@ -2352,11 +2352,11 @@
 
                     // Chỉ dựng tường dọc ngăn cách nhà xe với khu cầu thang Đông Bắc.
                     // Không dựng tường phía sau dãy lớp A1-A6.
-                    fillRect(68, 2, 68, 41, T.WALL);
+                    fillRect(68, 2, 68, 37, T.WALL); // đoạn x=68,y=38..41 đã dời sang x=63
 
                     // Tường xanh ngăn nhà xe kín hoàn toàn: đoạn phía dưới (x=68, y=38..41)
                     // và ô phía trên (x=68, y=1) đều là tường xanh.
-                    fillRect(68, 38, 68, 41, T.WALL);
+                    fillRect(63, 38, 63, 41, T.WALL);
                     grid[1][68] = T.WALL;
 
                     // Thảm cỏ khu đại thụ mới (vùng bên phải nhà kính, gần tường biên).
