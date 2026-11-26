@@ -2324,9 +2324,9 @@
                     fillRect(19, 47, 33, 53, T.GARAGE_FLOOR);
                     halls.push({ x1: 19, y1: 47, x2: 33, y2: 53, label: 'NHÀ XE GV', isZoneLabel: true });
 
-                    // 7. TOP-RIGHT: NHÀ XE HỌC SINH (X = 68 → 85)
-                    fillRect(68, 2, 85, 41, T.GARAGE_FLOOR);
-                    halls.push({ x1: 68, y1: 2, x2: 85, y2: 41, label: 'NHÀ XE', isZoneLabel: true });
+                    // 7. TOP-RIGHT: NHÀ XE HỌC SINH (mở rộng đến sát tường biên phải, x=91)
+                    fillRect(68, 2, 91, 41, T.GARAGE_FLOOR);
+                    halls.push({ x1: 68, y1: 2, x2: 91, y2: 41, label: 'NHÀ XE', isZoneLabel: true });
 
                     // Chỉ dựng tường dọc ngăn cách nhà xe với khu cầu thang Đông Bắc.
                     // Không dựng tường phía sau dãy lớp A1-A6.
@@ -3187,7 +3187,7 @@
                     return { zone: 'Sân Trường Trung Tâm', wing: 'Khu Sân Cờ (Tầng 1)' };
                 }
                 if (ptx >= 69 && ptx <= 74 && pty >= 9 && pty <= 17) return { zone: 'Vườn Rau Bác Hồ', wing: 'Nhà Kính • Khu Nhà Xe Học Sinh' };
-                if (ptx >= 68 && ptx <= 85 && pty >= 2 && pty <= 41) return { zone: 'Nhà Xe Học Sinh', wing: 'Khu Ngoại Vi Đông' };
+                if (ptx >= 68 && ptx <= 91 && pty >= 2 && pty <= 41) return { zone: 'Nhà Xe Học Sinh', wing: 'Khu Ngoại Vi Đông' };
                 if (ptx >= 78 && ptx <= 83 && pty >= 45 && pty <= 49) return { zone: 'Trạm Lấy Thẻ Xe', wing: 'Khu Nhà Xe & Cổng Phụ Đông Nam' };
                 if (ptx >= 77 && ptx <= 83 && pty >= 54 && pty <= 57) return { zone: 'Cổng Phụ Đông Nam', wing: 'Lối Ra Cổng Phụ' };
                 if (ptx >= 86 && ptx <= 91 && pty >= 42 && pty <= 53) return { zone: 'Khu Phòng Câu Lạc Bộ & Đoàn', wing: 'Khu Mở Rộng Đông Nam' };
@@ -4818,7 +4818,6 @@
                 const bedH = 6.35 * TILE;
                 const bedW = 1.15 * TILE;
                 entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 76.15 * TILE, bedY, bedW, bedH, 1) });
-                entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 84.05 * TILE, bedY, bedW, bedH, 3) });
                 // Cây đại thụ giữa thảm cỏ mới, tán lớn và thân đặt giữa khu đất.
                 const giantTreeX = 86.5 * TILE, giantTreeY = 12.0 * TILE;
                 entities.push({ y: giantTreeY + 1.5 * TILE, draw: () => drawPixelTree(giantTreeX, giantTreeY, 2.05, txSeed(805, 600)) });
