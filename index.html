@@ -2363,18 +2363,18 @@
                     // 8. MỞ RỘNG GÓC ĐÔNG NAM
                     // Đã xóa hai dải cỏ hai bên khu nhà xe / trạm lấy thẻ xe.
 
-                    fillRect(78, 45, 83, 49, T.CARD_BOOTH);
-                    halls.push({ x1: 78, y1: 45, x2: 83, y2: 49, label: 'LẤY THẺ XE', isZoneLabel: true });
+                    fillRect(74, 45, 79, 49, T.CARD_BOOTH);
+                    halls.push({ x1: 74, y1: 45, x2: 79, y2: 49, label: 'LẤY THẺ XE', isZoneLabel: true });
 
-                    fillRect(77, 56, 83, 57, T.GATE);
-                    halls.push({ x1: 77, y1: 54, x2: 83, y2: 55, label: 'CỔNG PHỤ', isZoneLabel: true });
+                    fillRect(73, 56, 79, 57, T.GATE);
+                    halls.push({ x1: 73, y1: 54, x2: 79, y2: 55, label: 'CỔNG PHỤ', isZoneLabel: true });
 
                     // Gộp phòng Câu Lạc Bộ và Phòng Đoàn thành một không gian duy nhất,
                     // diện tích mặt bằng bằng tổng diện tích hai phòng cũ.
                     buildRoom(86, 42, 91, 53, 'PHÒNG ĐOÀN - HỘI & CÂU LẠC BỘ', 'left', 'club_union_hub', 'Khu Đoàn - Hội & CLB');
 
                     // 9. BOTTOM-RIGHT: KHUÔN VIÊN TƯỢNG NGUYỄN VĂN CỪ
-                    fillRect(57, 43, 74, 55, T.PARK_PLAZA);
+                    fillRect(57, 43, 71, 55, T.PARK_PLAZA); // đã xóa 3 cột nền bên phải (x=72..74)
                     fillRect(58, 46, 62, 51, T.MONUMENT);
                     halls.push({ x1: 58, y1: 46, x2: 62, y2: 51, label: 'TƯỢNG NGUYỄN VĂN CỪ', isMonument: true });
                     fillRect(65, 46, 65, 47, T.BENCH);
@@ -2911,7 +2911,7 @@
                 { floor: 1, x: 21 * TILE, y: 22 * TILE, dir: 'up', gender: 'male', speed: 95, timer: 1.8, frame: 0 },
                 { floor: 1, x: 9 * TILE, y: 44 * TILE, dir: 'right', gender: 'female', speed: 95, timer: 2.1, frame: 0 },
                 { floor: 1, x: 64 * TILE, y: 46 * TILE, dir: 'up', gender: 'female', speed: 55, timer: 3.0, frame: 0 },
-                { floor: 1, x: 80.5 * TILE, y: 47 * TILE, dir: 'down', gender: 'male', speed: 0, timer: 99, frame: 0 },
+                { floor: 1, x: 76.5 * TILE, y: 47 * TILE, dir: 'down', gender: 'male', speed: 0, timer: 99, frame: 0 },
                 { floor: 2, x: 48 * TILE, y: 10 * TILE, dir: 'right', gender: 'male', speed: 75, timer: 2.2, frame: 0 },
                 { floor: 3, x: 48 * TILE, y: 10 * TILE, dir: 'left', gender: 'female', speed: 75, timer: 2.4, frame: 0 }
             ]
@@ -2944,8 +2944,8 @@
             // Bồn hoa hai bên trạm lấy thẻ xe là vật cản: người chơi phải đi vòng quanh.
             if (floorNum === 1) {
                 const planterRects = [
-                    { x1: 76.15 * TILE, y1: 44.25 * TILE, x2: 77.30 * TILE, y2: 50.60 * TILE },
-                    { x1: 84.05 * TILE, y1: 44.25 * TILE, x2: 85.20 * TILE, y2: 50.60 * TILE }
+                    { x1: 72.15 * TILE, y1: 44.25 * TILE, x2: 73.30 * TILE, y2: 50.60 * TILE },
+                    { x1: 80.05 * TILE, y1: 44.25 * TILE, x2: 81.20 * TILE, y2: 50.60 * TILE }
                 ];
                 if (planterRects.some(rect => worldX >= rect.x1 && worldX <= rect.x2 && worldY >= rect.y1 && worldY <= rect.y2)) return false;
                 // Thân 6 cây lớn ở sân thu giữa hai tháp WC là vật cản.
@@ -3185,8 +3185,8 @@
                 }
                 if (ptx >= 69 && ptx <= 74 && pty >= 9 && pty <= 17) return { zone: 'Vườn Rau Bác Hồ', wing: 'Nhà Kính • Khu Nhà Xe Học Sinh' };
                 if (ptx >= 68 && ptx <= 91 && pty >= 2 && pty <= 41) return { zone: 'Nhà Xe Học Sinh', wing: 'Khu Ngoại Vi Đông' };
-                if (ptx >= 78 && ptx <= 83 && pty >= 45 && pty <= 49) return { zone: 'Trạm Lấy Thẻ Xe', wing: 'Khu Nhà Xe & Cổng Phụ Đông Nam' };
-                if (ptx >= 77 && ptx <= 83 && pty >= 54 && pty <= 57) return { zone: 'Cổng Phụ Đông Nam', wing: 'Lối Ra Cổng Phụ' };
+                if (ptx >= 74 && ptx <= 79 && pty >= 45 && pty <= 49) return { zone: 'Trạm Lấy Thẻ Xe', wing: 'Khu Nhà Xe & Cổng Phụ Đông Nam' };
+                if (ptx >= 73 && ptx <= 79 && pty >= 54 && pty <= 57) return { zone: 'Cổng Phụ Đông Nam', wing: 'Lối Ra Cổng Phụ' };
                 if (ptx >= 86 && ptx <= 91 && pty >= 42 && pty <= 53) return { zone: 'Khu Phòng Câu Lạc Bộ & Đoàn', wing: 'Khu Mở Rộng Đông Nam' };
                 if (ptx >= 57 && ptx <= 74 && pty >= 43 && pty <= 55) return { zone: 'Tượng Đài Nguyễn Văn Cừ', wing: 'Công Viên Đông Nam' };
                 if (ptx >= 49 && ptx <= 55 && pty >= 44 && pty <= 52) return { zone: 'Vườn Hoa & Bãi Cỏ Sân Trước', wing: 'Khu Cảnh Quan Nam' };
@@ -4112,7 +4112,7 @@
                     ctx.fillRect(x, y, TILE, TILE);
                     ctx.fillStyle = 'rgba(71,85,105,.22)';
                     ctx.fillRect(x + 2, y + TILE - 3, TILE - 4, 2);
-                    if ((tx === 80 || tx === 81) && ty === 47) {
+                    if ((tx === 76 || tx === 77) && ty === 47) {
                         ctx.fillStyle = '#334155';
                         ctx.fillRect(x + 6, y + 8, TILE - 12, TILE - 16);
                         ctx.fillStyle = '#fbbf24';
@@ -4151,8 +4151,8 @@
                 case T.GATE:
                     ctx.fillStyle = '#cbd5e1';
                     ctx.fillRect(x, y, TILE, TILE);
-                    if (tx === 43 || tx === 52 || tx === 77 || tx === 83) {
-                        ctx.fillStyle = (tx >= 77) ? '#1d4ed8' : '#991b1b';
+                    if (tx === 43 || tx === 52 || tx === 73 || tx === 79) {
+                        ctx.fillStyle = (tx >= 73) ? '#1d4ed8' : '#991b1b';
                         ctx.fillRect(x + 4, y + 4, TILE - 8, TILE - 8);
                         ctx.strokeStyle = '#facc15';
                         ctx.lineWidth = 2;
@@ -4810,11 +4810,11 @@
             }
 
             if (floorNum === 1) {
-                // Hai bồn hoa ngắn đặt hai bên TRẠM LẤY THẺ XE (x=78..83, y=45..49), không đặt dọc nhà xe.
+                // Hai bồn hoa ngắn đặt hai bên TRẠM LẤY THẺ XE (x=74..79, y=45..49), không đặt dọc nhà xe.
                 const bedY = 44.25 * TILE;
                 const bedH = 6.35 * TILE;
                 const bedW = 1.15 * TILE;
-                entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 76.15 * TILE, bedY, bedW, bedH, 1) });
+                entities.push({ y: bedY + bedH, draw: () => drawParkingFlowerBed(ctx, 72.15 * TILE, bedY, bedW, bedH, 1) });
                 // Cây đại thụ giữa thảm cỏ mới, tán lớn và thân đặt giữa khu đất.
                 const giantTreeX = 86.5 * TILE, giantTreeY = 12.0 * TILE;
                 entities.push({ y: giantTreeY + 1.5 * TILE, draw: () => drawPixelTree(giantTreeX, giantTreeY, 2.05, txSeed(805, 600)) });
@@ -5391,7 +5391,7 @@
                 if (Math.hypot(state.player.x - 43.25*TILE, state.player.y - 39.25*TILE) < 105) {
                     foundInteractable = { kind: 'school_history_board' };
                 }
-                if (!foundInteractable && ptx >= 78 && ptx <= 83 && pty >= 45 && pty <= 49) {
+                if (!foundInteractable && ptx >= 74 && ptx <= 79 && pty >= 45 && pty <= 49) {
                     foundInteractable = { kind: 'card_booth' };
                 }
 
