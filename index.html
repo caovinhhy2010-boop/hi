@@ -2363,11 +2363,11 @@
                     // 8. MỞ RỘNG GÓC ĐÔNG NAM
                     // Đã xóa hai dải cỏ hai bên khu nhà xe / trạm lấy thẻ xe.
 
-                    fillRect(78, 45, 83, 49, T.CARD_BOOTH);
-                    halls.push({ x1: 78, y1: 45, x2: 83, y2: 49, label: 'LẤY THẺ XE', isZoneLabel: true });
+                    fillRect(76, 45, 81, 49, T.CARD_BOOTH);
+                    halls.push({ x1: 76, y1: 45, x2: 81, y2: 49, label: 'LẤY THẺ XE', isZoneLabel: true });
 
-                    fillRect(77, 56, 83, 57, T.GATE);
-                    halls.push({ x1: 77, y1: 54, x2: 83, y2: 55, label: 'CỔNG PHỤ', isZoneLabel: true });
+                    fillRect(75, 56, 81, 57, T.GATE);
+                    halls.push({ x1: 75, y1: 54, x2: 81, y2: 55, label: 'CỔNG PHỤ', isZoneLabel: true });
 
                     // Gộp phòng Câu Lạc Bộ và Phòng Đoàn thành một không gian duy nhất,
                     // diện tích mặt bằng bằng tổng diện tích hai phòng cũ.
@@ -2944,8 +2944,8 @@
             // Bồn hoa hai bên trạm lấy thẻ xe là vật cản: người chơi phải đi vòng quanh.
             if (floorNum === 1) {
                 const planterRects = [
-                    { x1: 76.15 * TILE, y1: 44.25 * TILE, x2: 77.30 * TILE, y2: 50.60 * TILE },
-                    { x1: 84.05 * TILE, y1: 44.25 * TILE, x2: 85.20 * TILE, y2: 50.60 * TILE }
+                    { x1: 74.15 * TILE, y1: 44.25 * TILE, x2: 75.30 * TILE, y2: 50.60 * TILE },
+                    { x1: 82.05 * TILE, y1: 44.25 * TILE, x2: 83.20 * TILE, y2: 50.60 * TILE }
                 ];
                 if (planterRects.some(rect => worldX >= rect.x1 && worldX <= rect.x2 && worldY >= rect.y1 && worldY <= rect.y2)) return false;
                 // Thân 6 cây lớn ở sân thu giữa hai tháp WC là vật cản.
@@ -3185,8 +3185,8 @@
                 }
                 if (ptx >= 69 && ptx <= 74 && pty >= 9 && pty <= 17) return { zone: 'Vườn Rau Bác Hồ', wing: 'Nhà Kính • Khu Nhà Xe Học Sinh' };
                 if (ptx >= 68 && ptx <= 91 && pty >= 2 && pty <= 41) return { zone: 'Nhà Xe Học Sinh', wing: 'Khu Ngoại Vi Đông' };
-                if (ptx >= 78 && ptx <= 83 && pty >= 45 && pty <= 49) return { zone: 'Trạm Lấy Thẻ Xe', wing: 'Khu Nhà Xe & Cổng Phụ Đông Nam' };
-                if (ptx >= 77 && ptx <= 83 && pty >= 54 && pty <= 57) return { zone: 'Cổng Phụ Đông Nam', wing: 'Lối Ra Cổng Phụ' };
+                if (ptx >= 76 && ptx <= 81 && pty >= 45 && pty <= 49) return { zone: 'Trạm Lấy Thẻ Xe', wing: 'Khu Nhà Xe & Cổng Phụ Đông Nam' };
+                if (ptx >= 75 && ptx <= 81 && pty >= 54 && pty <= 57) return { zone: 'Cổng Phụ Đông Nam', wing: 'Lối Ra Cổng Phụ' };
                 if (ptx >= 86 && ptx <= 91 && pty >= 42 && pty <= 53) return { zone: 'Khu Phòng Câu Lạc Bộ & Đoàn', wing: 'Khu Mở Rộng Đông Nam' };
                 if (ptx >= 57 && ptx <= 74 && pty >= 43 && pty <= 55) return { zone: 'Tượng Đài Nguyễn Văn Cừ', wing: 'Công Viên Đông Nam' };
                 if (ptx >= 49 && ptx <= 55 && pty >= 44 && pty <= 52) return { zone: 'Vườn Hoa & Bãi Cỏ Sân Trước', wing: 'Khu Cảnh Quan Nam' };
