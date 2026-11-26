@@ -2361,10 +2361,7 @@
                     fillRect(41, 6, 62, 7, T.TURF_GRASS);
 
                     // 8. MỞ RỘNG GÓC ĐÔNG NAM
-                    for (let ty = 43; ty <= 53; ty++) {
-                        grid[ty][76] = T.TURF_GRASS;
-                        grid[ty][85] = T.TURF_GRASS;
-                    }
+                    // Đã xóa hai dải cỏ hai bên khu nhà xe / trạm lấy thẻ xe.
 
                     fillRect(78, 45, 83, 49, T.CARD_BOOTH);
                     halls.push({ x1: 78, y1: 45, x2: 83, y2: 49, label: 'LẤY THẺ XE', isZoneLabel: true });
