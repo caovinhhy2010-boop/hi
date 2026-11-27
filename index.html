@@ -2192,7 +2192,8 @@
             GH_WALL: 33,
             GH_DOOR: 34,
             GH_PATH: 35,
-            GH_BED: 36
+            GH_BED: 36,
+            FLOWER_LAWN: 37
         };
 
         const floorsData = {
@@ -2390,6 +2391,9 @@
 
                     fillRect(73, 56, 79, 57, T.GATE);
                     halls.push({ x1: 73, y1: 54, x2: 79, y2: 55, label: 'CỔNG PHỤ', isZoneLabel: true });
+
+                    // Thảm cỏ có hoa bên phải trạm lấy thẻ xe (vùng người dùng khoanh đỏ).
+                    fillRect(81, 44, 83, 51, T.FLOWER_LAWN);
 
                     // Gộp phòng Câu Lạc Bộ và Phòng Đoàn thành một không gian duy nhất,
                     // diện tích mặt bằng bằng tổng diện tích hai phòng cũ.
@@ -2988,6 +2992,7 @@
                 tile === T.WC_FLOOR ||
                 tile === T.CAMPUS_GROUND ||
                 tile === T.TURF_GRASS ||
+                tile === T.FLOWER_LAWN ||
                 tile === T.GARAGE_FLOOR ||
                 tile === T.PARK_PLAZA ||
                 tile === T.GATE ||
@@ -4119,6 +4124,33 @@
                     ctx.fillRect(x, y, TILE, TILE);
                     break;
 
+                case T.FLOWER_LAWN: {
+                    // Thảm cỏ có hoa: nền cỏ hai tông, ngọn cỏ rải đều và các bông hoa nhiều màu (cố định theo ô).
+                    ctx.fillStyle = ((tx + ty) % 2 === 0) ? '#4ca84a' : '#43993f';
+                    ctx.fillRect(x, y, TILE, TILE);
+                    let h = txSeed(tx, ty * 7 + 3);
+                    const rnd = () => { h = (Math.imul(h, 1664525) + 1013904223) >>> 0; return h / 4294967296; };
+                    for (let i = 0; i < 9; i++) {
+                        const bx = Math.floor(rnd() * (TILE - 4)), by = Math.floor(rnd() * (TILE - 6));
+                        ctx.fillStyle = (i % 2) ? '#2f7d34' : '#7bd05a';
+                        ctx.fillRect(x + bx, y + by + 2, 2, 4);
+                        ctx.fillRect(x + bx + 2, y + by, 2, 5);
+                    }
+                    const petals = ['#f9a8d4', '#fde047', '#ffffff', '#c084fc', '#fb7185', '#fdba74'];
+                    const nFlowers = 3 + Math.floor(rnd() * 2);
+                    for (let i = 0; i < nFlowers; i++) {
+                        const fx = x + 5 + Math.floor(rnd() * (TILE - 16)), fy = y + 5 + Math.floor(rnd() * (TILE - 16));
+                        const col = petals[Math.floor(rnd() * petals.length)];
+                        ctx.fillStyle = '#2f7d34'; ctx.fillRect(fx + 3, fy + 6, 2, 5);
+                        ctx.fillStyle = col;
+                        ctx.fillRect(fx + 3, fy, 2, 2); ctx.fillRect(fx + 3, fy + 4, 2, 2);
+                        ctx.fillRect(fx, fy + 2, 2, 2); ctx.fillRect(fx + 6, fy + 2, 2, 2);
+                        ctx.fillStyle = (col === '#fde047') ? '#f97316' : '#fde047';
+                        ctx.fillRect(fx + 3, fy + 2, 2, 2);
+                    }
+                    break;
+                }
+
                 case T.GARAGE_FLOOR:
                     ctx.fillStyle = ((tx + ty) % 2 === 0) ? '#cbd5e1' : '#dbeafe';
                     ctx.fillRect(x, y, TILE, TILE);
@@ -5188,7 +5220,7 @@
                     } else if (t === T.WALL || t === T.HALL_SOLID || t === T.MONUMENT) {
                         miniCtx.fillStyle = '#64748b';
                         miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
-                    } else if (t === T.TURF_GRASS || t === T.BIG_TREE || t === T.CARD_BOOTH) {
+                    } else if (t === T.TURF_GRASS || t === T.FLOWER_LAWN || t === T.BIG_TREE || t === T.CARD_BOOTH) {
                         miniCtx.fillStyle = '#16a34a';
                         miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
                     } else if (t === T.GATE) {
