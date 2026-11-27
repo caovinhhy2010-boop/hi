@@ -2193,7 +2193,9 @@
             GH_DOOR: 34,
             GH_PATH: 35,
             GH_BED: 36,
-            FLOWER_LAWN: 37
+            FLOWER_LAWN: 37,
+            DRY_LAWN: 38,
+            SAND_GROUND: 39
         };
 
         const floorsData = {
@@ -2349,6 +2351,10 @@
 
                     // 7. TOP-RIGHT: NHÀ XE HỌC SINH (mở rộng đến sát tường biên phải, x=91)
                     fillRect(68, 2, 91, 41, T.GARAGE_FLOOR);
+                    // Nền cát cho cả khu bên trái nhà xe (vùng khoanh đỏ trên minimap, quanh nhà kính).
+                    fillRect(69, 2, 76, 37, T.SAND_GROUND);
+                    // Thảm cỏ chết ngả vàng ở góc dưới bên phải nhà xe.
+                    fillRect(79, 34, 91, 41, T.DRY_LAWN);
                     halls.push({ x1: 68, y1: 2, x2: 91, y2: 41, label: 'NHÀ XE', isZoneLabel: true });
 
                     // Chỉ dựng tường dọc ngăn cách nhà xe với khu cầu thang Đông Bắc.
@@ -2975,6 +2981,7 @@
                 ];
                 if (planterRects.some(rect => worldX >= rect.x1 && worldX <= rect.x2 && worldY >= rect.y1 && worldY <= rect.y2)) return false;
                 // Thân 6 cây lớn ở sân thu giữa hai tháp WC là vật cản.
+                if (Math.abs(worldX - DRY_LAWN_TREE.x * TILE) <= 0.42 * TILE && worldY <= DRY_LAWN_TREE.y * TILE && worldY >= (DRY_LAWN_TREE.y - 0.7) * TILE) return false;
                 if (ALL_AUTUMN_TREES.some(tr => Math.abs(worldX - tr.x * TILE) <= 0.42 * TILE && worldY <= tr.y * TILE && worldY >= (tr.y - 0.7) * TILE)) return false;
             }
 
@@ -2993,6 +3000,8 @@
                 tile === T.CAMPUS_GROUND ||
                 tile === T.TURF_GRASS ||
                 tile === T.FLOWER_LAWN ||
+                tile === T.DRY_LAWN ||
+                tile === T.SAND_GROUND ||
                 tile === T.GARAGE_FLOOR ||
                 tile === T.PARK_PLAZA ||
                 tile === T.GATE ||
@@ -4124,6 +4133,43 @@
                     ctx.fillRect(x, y, TILE, TILE);
                     break;
 
+                case T.DRY_LAWN: {
+                    // Thảm cỏ chết: cỏ ngả vàng, lẫn mảng đất khô và ngọn cỏ úa.
+                    ctx.fillStyle = ((tx + ty) % 2 === 0) ? '#a8a73e' : '#9c9b37';
+                    ctx.fillRect(x, y, TILE, TILE);
+                    let h = txSeed(tx * 3 + 5, ty * 11 + 1);
+                    const rnd = () => { h = (Math.imul(h, 1664525) + 1013904223) >>> 0; return h / 4294967296; };
+                    for (let i = 0; i < 3; i++) {
+                        ctx.fillStyle = 'rgba(133, 97, 52, 0.30)';
+                        ctx.fillRect(x + Math.floor(rnd() * (TILE - 12)), y + Math.floor(rnd() * (TILE - 8)), 8 + Math.floor(rnd() * 8), 4 + Math.floor(rnd() * 4));
+                    }
+                    const blade = ['#cbbd4f', '#7f7b2b', '#d8c95e', '#8a8a30'];
+                    for (let i = 0; i < 11; i++) {
+                        const bx = Math.floor(rnd() * (TILE - 4)), by = Math.floor(rnd() * (TILE - 6));
+                        ctx.fillStyle = blade[i % blade.length];
+                        ctx.fillRect(x + bx, y + by + 2, 2, 4);
+                        ctx.fillRect(x + bx + 2, y + by, 2, 5);
+                    }
+                    break;
+                }
+
+                case T.SAND_GROUND: {
+                    // Nền cát vàng nhạt có hạt và gợn.
+                    ctx.fillStyle = ((tx + ty) % 2 === 0) ? '#e8d6a2' : '#e2cf97';
+                    ctx.fillRect(x, y, TILE, TILE);
+                    let h = txSeed(tx * 5 + 2, ty * 13 + 7);
+                    const rnd = () => { h = (Math.imul(h, 1664525) + 1013904223) >>> 0; return h / 4294967296; };
+                    for (let i = 0; i < 14; i++) {
+                        ctx.fillStyle = (i % 3 === 0) ? '#f4e8c1' : (i % 3 === 1) ? '#c9b377' : '#d6c184';
+                        ctx.fillRect(x + Math.floor(rnd() * (TILE - 3)), y + Math.floor(rnd() * (TILE - 3)), 2, 2);
+                    }
+                    if (rnd() < 0.35) {
+                        ctx.fillStyle = 'rgba(190, 160, 95, 0.35)';
+                        ctx.fillRect(x + 6 + Math.floor(rnd() * 14), y + 10 + Math.floor(rnd() * 24), 16, 2);
+                    }
+                    break;
+                }
+
                 case T.FLOWER_LAWN: {
                     // Thảm cỏ có hoa: nền cỏ hai tông, ngọn cỏ rải đều và các bông hoa nhiều màu (cố định theo ô).
                     ctx.fillStyle = ((tx + ty) % 2 === 0) ? '#4ca84a' : '#43993f';
@@ -4561,6 +4607,7 @@
             { x: 45.0, y: 7.8 }, { x: 51.5, y: 7.8 }, { x: 58.0, y: 7.8 }
         ];
         const AUTUMN_TREE_SCALE = 1.05;
+        const DRY_LAWN_TREE = { x: 81.5, y: 40.0 };
         // Hàng cây dọc cạnh trên bản đồ (cùng kiểu với khu sân thu), chạy từ căn tin sang hết nhà xe.
         const ROW_TREES = [
             { x: 6.0, y: 2.8 }, { x: 12.5, y: 2.8 }, { x: 19.0, y: 2.8 }, { x: 25.5, y: 2.8 }, { x: 32.0, y: 2.8 }, { x: 38.5, y: 2.8 },
@@ -4872,6 +4919,8 @@
                 // Cây đại thụ giữa thảm cỏ mới, tán lớn và thân đặt giữa khu đất.
                 const giantTreeX = 86.5 * TILE, giantTreeY = 12.0 * TILE;
                 entities.push({ y: giantTreeY + 1.5 * TILE, draw: () => drawPixelTree(giantTreeX, giantTreeY, 2.05, txSeed(805, 600)) });
+                // Cây trên thảm cỏ chết (vị trí khoanh xanh).
+                entities.push({ y: DRY_LAWN_TREE.y * TILE, draw: () => drawPixelTree(DRY_LAWN_TREE.x * TILE, DRY_LAWN_TREE.y * TILE, 1.05, txSeed(917, 33)) });
                 ALL_AUTUMN_TREES.forEach((tr, i) => {
                     const sx = tr.x * TILE, sy = tr.y * TILE;
                     if (sx < effCamX - 5 * TILE || sx > effCamX + canvas.width + 5 * TILE || sy < effCamY - 2 * TILE || sy > effCamY + canvas.height + 6 * TILE) return;
@@ -5207,6 +5256,12 @@
                     const t = baseGrid[y][x];
                     if (t === T.CORRIDOR || t === T.ROOM_FLOOR || t === T.WC_FLOOR || t === T.GARAGE_FLOOR || t === T.PARK_PLAZA) {
                         miniCtx.fillStyle = '#cbd5e1';
+                        miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
+                    } else if (t === T.SAND_GROUND) {
+                        miniCtx.fillStyle = '#e7d3a0';
+                        miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
+                    } else if (t === T.DRY_LAWN) {
+                        miniCtx.fillStyle = '#a3a23c';
                         miniCtx.fillRect(x * sx, y * sy, sx + 0.5, sy + 0.5);
                     } else if (t === T.VOLLEYBALL_COURT) {
                         miniCtx.fillStyle = '#e5d49c';
