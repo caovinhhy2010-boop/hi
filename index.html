@@ -1936,6 +1936,62 @@
             ctx.restore();
         }
 
+        // Mái che tôn trắng bạc cho toàn bộ khu nhà xe học sinh.
+        const STUDENT_PARKING_ROOF = { x1: 73.0, y1: 3.0, x2: 91.0, y2: 41.0, fadeAlpha: 0.94 };
+
+        function drawWhiteTinParkingRoof(ctx, alpha) {
+            if (alpha <= 0.02) return;
+            const rx = STUDENT_PARKING_ROOF.x1 * TILE;
+            const ry = STUDENT_PARKING_ROOF.y1 * TILE;
+            const rw = (STUDENT_PARKING_ROOF.x2 - STUDENT_PARKING_ROOF.x1) * TILE;
+            const rh = (STUDENT_PARKING_ROOF.y2 - STUDENT_PARKING_ROOF.y1) * TILE;
+            ctx.save();
+            ctx.globalAlpha = alpha;
+
+            // Bóng mái và khung thép đỡ.
+            ctx.fillStyle = 'rgba(15,23,42,.30)';
+            ctx.fillRect(rx + 8, ry + 12, rw, rh);
+            ctx.fillStyle = '#475569';
+            for (let x = rx + 18; x < rx + rw; x += TILE * 3) {
+                ctx.fillRect(x - 4, ry + 8, 8, rh - 12);
+            }
+            for (let y = ry + 16; y < ry + rh; y += TILE * 4) {
+                ctx.fillRect(rx + 5, y - 3, rw - 10, 6);
+            }
+
+            // Các tấm tôn màu trắng bạc, có độ chuyển sáng nhẹ.
+            const metal = ctx.createLinearGradient(rx, ry, rx + rw, ry + rh);
+            metal.addColorStop(0, '#f8fafc');
+            metal.addColorStop(.45, '#dce4eb');
+            metal.addColorStop(1, '#aebbc8');
+            ctx.fillStyle = metal;
+            ctx.fillRect(rx, ry, rw, rh);
+
+            // Mối ghép tấm và gân tôn chạy dọc.
+            for (let x = rx + 5; x < rx + rw; x += 24) {
+                ctx.fillStyle = 'rgba(100,116,139,.42)';
+                ctx.fillRect(x, ry + 2, 2, rh - 4);
+                ctx.fillStyle = 'rgba(255,255,255,.72)';
+                ctx.fillRect(x + 3, ry + 2, 3, rh - 4);
+            }
+            for (let y = ry + TILE * 5; y < ry + rh; y += TILE * 5) {
+                ctx.fillStyle = 'rgba(71,85,105,.38)';
+                ctx.fillRect(rx + 2, y, rw - 4, 3);
+            }
+
+            // Viền mái và xà ngang ở hai đầu.
+            ctx.fillStyle = '#64748b';
+            ctx.fillRect(rx - 5, ry, 7, rh);
+            ctx.fillRect(rx + rw - 2, ry, 7, rh);
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(rx, ry, rw, 7);
+            ctx.fillRect(rx, ry + rh - 7, rw, 7);
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(rx, ry, rw, rh);
+            ctx.restore();
+        }
+
         function drawNVCSchoolCrest(ctx, cx, cy, radius) {
             const safeR = Math.max(8, radius);
             ctx.save();
@@ -4919,6 +4975,15 @@
                 // Cây đại thụ giữa thảm cỏ mới, tán lớn và thân đặt giữa khu đất.
                 const giantTreeX = 86.5 * TILE, giantTreeY = 12.0 * TILE;
                 entities.push({ y: giantTreeY + 1.5 * TILE, draw: () => drawPixelTree(giantTreeX, giantTreeY, 2.05, txSeed(805, 600)) });
+                // Hai cây đại thụ mới trên lối sân cát, đúng hai vị trí người chơi đánh dấu.
+                const sandyPathTrees = [
+                    { x: 64.5, y: 14.5, seed: 1201 },
+                    { x: 64.5, y: 31.5, seed: 1202 }
+                ];
+                sandyPathTrees.forEach(tr => {
+                    const sx = tr.x * TILE, sy = tr.y * TILE;
+                    entities.push({ y: sy + 1.5 * TILE, draw: () => drawPixelTree(sx, sy, 1.65, txSeed(tr.seed, 64)) });
+                });
                 // Cây trên thảm cỏ chết (vị trí khoanh xanh).
                 entities.push({ y: DRY_LAWN_TREE.y * TILE, draw: () => drawPixelTree(DRY_LAWN_TREE.x * TILE, DRY_LAWN_TREE.y * TILE, 1.05, txSeed(917, 33)) });
                 ALL_AUTUMN_TREES.forEach((tr, i) => {
@@ -5045,6 +5110,18 @@
             entities.sort((a, b) => a.y - b.y);
             entities.forEach(ent => ent.draw());
             if (floorNum === 1 && autumnAreaVisible(effCamX, effCamY)) drawAutumnFallingLeaves(timeSec);
+
+            // Mái tôn nhà xe học sinh: tự làm mờ khi nhân vật đi bên dưới.
+            if (floorNum === 1) {
+                const pxTile = state.player.x / TILE;
+                const pyTile = state.player.y / TILE;
+                const underParkingRoof = state.currentFloor === 1 &&
+                    pxTile >= STUDENT_PARKING_ROOF.x1 && pxTile <= STUDENT_PARKING_ROOF.x2 &&
+                    pyTile >= STUDENT_PARKING_ROOF.y1 && pyTile <= STUDENT_PARKING_ROOF.y2;
+                const targetRoofAlpha = underParkingRoof ? 0.18 : 0.94;
+                STUDENT_PARKING_ROOF.fadeAlpha += (targetRoofAlpha - STUDENT_PARKING_ROOF.fadeAlpha) * Math.min(1, dt * 9);
+                drawWhiteTinParkingRoof(ctx, STUDENT_PARKING_ROOF.fadeAlpha);
+            }
 
             // Mái che chữ A màu đỏ ở khu vực trung tâm sân chính với kỹ thuật Roof Fade
             if (floorNum === 1) {
